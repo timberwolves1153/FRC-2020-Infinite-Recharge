@@ -7,11 +7,14 @@
 
 package frc.robot;
 
+import com.revrobotics.ColorSensorV3;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.AuxMotor;
+import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Drive;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -34,6 +37,8 @@ public class Robot extends TimedRobot {
   public static Drive drive;
   public static AuxMotor auxMotor;
 
+  public static ColorSensor colorSensor;
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -46,8 +51,13 @@ public class Robot extends TimedRobot {
     drive = new Drive();
     auxMotor = new AuxMotor();
     oi = new OI();
+    colorSensor = new ColorSensor();
   }
 
+  private void updateDashboard(){
+    drive.updateDashboard();
+    colorSensor.updateShuffleboard();
+  }
 
   /**
    * This function is called every robot packet, no matter the mode. Use
@@ -59,8 +69,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
-    drive.updateDashboard();
+    updateDashboard();
     Scheduler.getInstance().run();
   }
 
@@ -110,7 +119,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    drive.updateDashboard();
+    updateDashboard();
 
     double power = oi.getDriverStick().getRawAxis(OI.JOYSTICK_LEFT_Y);
     double turn = oi.getDriverStick().getRawAxis(OI.JOYSTICK_RIGHT_X);
