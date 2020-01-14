@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
 import com.revrobotics.CANPIDController.AccelStrategy;
 import com.revrobotics.CANSparkMax.IdleMode;
 
@@ -40,7 +41,7 @@ public class Drive extends Subsystem {
   private CANPIDController leftPID;
   private CANPIDController rightPID;
 
-  public double p, i, d;
+  public double p, i, d, setpoint;
   private static final double MAX_OUTPUT = 1;
   private static final double MIN_OUTPUT = -1;
 
@@ -69,7 +70,7 @@ public class Drive extends Subsystem {
     rightPID = rightMaster.getPIDController();
 
     configMasterSparks();
-    //configMotionProfiling();
+    configMotionProfiling();
 
     differentialDrive = new DifferentialDrive(leftMaster, rightMaster);
   }
@@ -88,13 +89,14 @@ public class Drive extends Subsystem {
     p = 0;
     i = 0;
     d = 0; // Should remain at zero
+    setpoint = 0;
 
     setupPIDConstants(leftPID, p, i, d);
     setupPIDConstants(rightPID, p, i, d);
 
     // Trapezoidal Motion Profiling Parameters
-    setupProfilingParameters(leftPID, maxVelocity, minOutputVelocity, maxAccel);
-    setupProfilingParameters(rightPID, maxVelocity, minOutputVelocity, maxAccel);
+    /*setupProfilingParameters(leftPID, maxVelocity, minOutputVelocity, maxAccel);
+    setupProfilingParameters(rightPID, maxVelocity, minOutputVelocity, maxAccel);*/
 
     SmartDashboard.putNumber("P Gain", p);
     SmartDashboard.putNumber("I Gain", i);
@@ -102,6 +104,7 @@ public class Drive extends Subsystem {
     SmartDashboard.putNumber("Max Velocity", maxVelocity);
     SmartDashboard.putNumber("Min Output Velocity", minOutputVelocity);
     SmartDashboard.putNumber("Max Accel", maxAccel);
+    SmartDashboard.putNumber("Setpoint", setpoint);
   }
 
   private void setupPIDConstants(CANPIDController a, double p, double i, double d) {
@@ -136,7 +139,7 @@ public class Drive extends Subsystem {
     SmartDashboard.putNumber("Right Power", rightMaster.get());
     SmartDashboard.putNumber("Left Power", leftMaster.get());
 
-    /*double p = SmartDashboard.getNumber("P Gain", 0);
+    double p = SmartDashboard.getNumber("P Gain", 0);
     double i = SmartDashboard.getNumber("I Gain", 0);
     double d = SmartDashboard.getNumber("D Gain", 0);
     double maxVelocity = SmartDashboard.getNumber("Max Velocity", 0);
@@ -159,7 +162,7 @@ public class Drive extends Subsystem {
       this.d = d;
     }
 
-    if ((maxVelocity != this.maxVelocity)) {
+    /*if ((maxVelocity != this.maxVelocity)) {
       leftPID.setSmartMotionMaxVelocity(maxVelocity, SMART_MOTION_SLOT);
       rightPID.setSmartMotionMaxVelocity(maxVelocity, SMART_MOTION_SLOT);
       this.maxVelocity = maxVelocity;
@@ -174,6 +177,10 @@ public class Drive extends Subsystem {
       rightPID.setSmartMotionMaxAccel(maxAccel, SMART_MOTION_SLOT);
       this.maxAccel = maxAccel;
     }*/
+
+    setpoint = SmartDashboard.getNumber("Setpoint", 0);
+    leftPID.setReference(setpoint, ControlType.kVelocity);
+    rightPID.setReference(setpoint, ControlType.kVelocity);
   }
 
   public void resetEncoder(){
