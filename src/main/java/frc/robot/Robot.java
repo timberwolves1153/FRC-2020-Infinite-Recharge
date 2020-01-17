@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.AuxMotor;
 import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.command.Command;
 
 
@@ -36,6 +37,7 @@ public class Robot extends TimedRobot {
   public static OI oi;
   public static Drive drive;
   public static AuxMotor auxMotor;
+  public static Shooter shooter;
 
   public static ColorSensor colorSensor;
 
@@ -50,6 +52,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
     drive = new Drive();
     auxMotor = new AuxMotor();
+    shooter = new Shooter();
     oi = new OI();
     colorSensor = new ColorSensor();
   }
@@ -119,13 +122,17 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    Scheduler.getInstance().run();
     updateDashboard();
 
-    double power = oi.getDriverStick().getRawAxis(OI.JOYSTICK_LEFT_Y);
-    double turn = oi.getDriverStick().getRawAxis(OI.JOYSTICK_RIGHT_X);
-    drive.arcadeDrive(power, turn);
-
-    Scheduler.getInstance().run();
+    boolean pidEnabled = oi.drX.get();
+    if (!pidEnabled) {
+      double power = oi.getDriverStick().getRawAxis(OI.JOYSTICK_LEFT_Y);
+      double turn = oi.getDriverStick().getRawAxis(OI.JOYSTICK_RIGHT_X);
+      drive.arcadeDrive(power, turn);
+    } else {
+      drive.pidPeriodic();
+    }
   }
 
   /**

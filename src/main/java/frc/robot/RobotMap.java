@@ -20,4 +20,8 @@ public class RobotMap {
 
 	// Auxillary Talon
 	public static final int AUX_MOTOR = 7;
+
+	// Shooter Neos
+	public static final int SHOOTER_MOTOR_A = 8;
+	public static final int SHOOTER_MOTOR_B = 9;
 }

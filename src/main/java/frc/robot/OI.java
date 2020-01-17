@@ -28,15 +28,16 @@ public class OI {
     private Joystick opStick = new Joystick(OPERATOR_STICK);
     private Joystick driverStick = new Joystick(DRIVER_JOYSTICK);
 
-    private Button opA = new JoystickButton(opStick, 1);
-    private Button opB = new JoystickButton(opStick, 2);
+    public Button drA = new JoystickButton(driverStick, 1);
+    public Button drB = new JoystickButton(driverStick, 2);
+    public Button drX = new JoystickButton(driverStick, 3);
 
     public OI() {
         // Register all button-command associations here
-        opA.whenPressed(new AuxMotorForward());
-        opA.whenReleased(new AuxMotorStop());
-        opB.whenPressed(new AuxMotorBackward());
-        opB.whenReleased(new AuxMotorStop());
+        drA.whenPressed(new AuxMotorForward());
+        drA.whenReleased(new AuxMotorStop());
+        drB.whenPressed(new AuxMotorBackward());
+        drB.whenReleased(new AuxMotorStop());
     }
 
     public Joystick getOpStick() {

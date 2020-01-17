@@ -177,7 +177,9 @@ public class Drive extends Subsystem {
       rightPID.setSmartMotionMaxAccel(maxAccel, SMART_MOTION_SLOT);
       this.maxAccel = maxAccel;
     }*/
+  }
 
+  public void pidPeriodic() {
     setpoint = SmartDashboard.getNumber("Setpoint", 0);
     leftPID.setReference(setpoint, ControlType.kVelocity);
     rightPID.setReference(setpoint, ControlType.kVelocity);
