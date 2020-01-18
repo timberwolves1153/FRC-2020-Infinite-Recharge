@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import frc.robot.commands.AuxMotorBackward;
 import frc.robot.commands.AuxMotorForward;
 import frc.robot.commands.AuxMotorStop;
+import frc.robot.commands.ShooterShootCommand;
+import frc.robot.commands.ShooterStopCommand;
 
 public class OI {
 
@@ -30,7 +32,8 @@ public class OI {
 
     public Button drA = new JoystickButton(driverStick, 1);
     public Button drB = new JoystickButton(driverStick, 2);
-    public Button drX = new JoystickButton(driverStick, 3);
+    public edu.wpi.first.wpilibj2.command.button.Button drX = new edu.wpi.first.wpilibj2.command.button.JoystickButton(driverStick, 3);
+    public edu.wpi.first.wpilibj2.command.button.Button drY = new edu.wpi.first.wpilibj2.command.button.JoystickButton(driverStick, 4);
 
     public OI() {
         // Register all button-command associations here
@@ -38,6 +41,11 @@ public class OI {
         drA.whenReleased(new AuxMotorStop());
         drB.whenPressed(new AuxMotorBackward());
         drB.whenReleased(new AuxMotorStop());
+        
+        drX.whenPressed(new ShooterShootCommand(1));
+        drX.whenReleased(new ShooterStopCommand());
+        drY.whenPressed(new ShooterShootCommand(0.5));
+        drY.whenReleased(new ShooterStopCommand());
     }
 
     public Joystick getOpStick() {
