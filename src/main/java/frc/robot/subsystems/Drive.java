@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,20 +11,14 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
-import com.revrobotics.CANPIDController.AccelStrategy;
 import com.revrobotics.CANSparkMax.IdleMode;
 
-import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
-/**
- * Add your docs here.
- */
-public class Drive extends Subsystem {
-  // Put methods for controlling this subsystem
-  // here. Call these from Commands.
+public class Drive extends SubsystemBase {
 
   // Drivetrain Motor controllers
   private CANSparkMax leftMaster;
@@ -37,6 +31,8 @@ public class Drive extends Subsystem {
   private CANEncoder leftEncoder;
   private CANEncoder rightEncoder;
 
+  private boolean pidEnabled = false;
+
   // Drive Motion Profiling
   private CANPIDController leftPID;
   private CANPIDController rightPID;
@@ -45,17 +41,14 @@ public class Drive extends Subsystem {
   private static final double MAX_OUTPUT = 1;
   private static final double MIN_OUTPUT = -1;
 
-  private static final int SMART_MOTION_SLOT = 0;
+  //private static final int SMART_MOTION_SLOT = 0;
   public double maxVelocity, minOutputVelocity, maxAccel;
 
   private DifferentialDrive differentialDrive;
 
-  @Override
-  public void initDefaultCommand() {
-    // Set the default command for a subsystem here.
-    // setDefaultCommand(new MySpecialCommand());
-  }
-
+  /**
+   * Creates a new Drive.
+   */
   public Drive() {
     leftMaster = new CANSparkMax(RobotMap.LEFT_MASTER, CANSparkMax.MotorType.kBrushless);
     leftFollowerA = new CANSparkMax(RobotMap.LEFT_FOLLOWER_A, CANSparkMax.MotorType.kBrushless);
@@ -86,9 +79,9 @@ public class Drive extends Subsystem {
     rightMaster.restoreFactoryDefaults();
 
     // Velocity Regulation PID constants
-    p = 0;
-    i = 0;
-    d = 0; // Should remain at zero
+    p = 0.0000036902;
+    i = 0.0001314766;
+    d = 0;
     setpoint = 0;
 
     setupPIDConstants(leftPID, p, i, d);
@@ -114,23 +107,15 @@ public class Drive extends Subsystem {
     a.setOutputRange(MIN_OUTPUT, MAX_OUTPUT);
   }
 
-  private void setupProfilingParameters(CANPIDController a, double maxVelocity, double minOutputVelocity, double maxAccel) {
+  /*private void setupProfilingParameters(CANPIDController a, double maxVelocity, double minOutputVelocity, double maxAccel) {
     a.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, SMART_MOTION_SLOT);
     a.setSmartMotionMaxVelocity(maxVelocity, SMART_MOTION_SLOT);
     a.setSmartMotionMinOutputVelocity(minOutputVelocity, SMART_MOTION_SLOT);
     a.setSmartMotionMaxAccel(maxAccel, SMART_MOTION_SLOT);
-  }
+  }*/
 
   public void arcadeDrive(double power, double turn) {
-    differentialDrive.arcadeDrive(power, -turn);
-  }
-
-  public double getRightEncoderValue() {
-    return rightEncoder.getPosition();
-  }
-
-  public double getLeftEncoderValue() {
-    return leftEncoder.getPosition();
+    differentialDrive.arcadeDrive(power, turn);
   }
 
   public void updateDashboard() {
@@ -142,9 +127,9 @@ public class Drive extends Subsystem {
     double p = SmartDashboard.getNumber("P Gain", 0);
     double i = SmartDashboard.getNumber("I Gain", 0);
     double d = SmartDashboard.getNumber("D Gain", 0);
-    double maxVelocity = SmartDashboard.getNumber("Max Velocity", 0);
+    /*double maxVelocity = SmartDashboard.getNumber("Max Velocity", 0);
     double minOutputVelocity = SmartDashboard.getNumber("Min Output Velocity", 0);
-    double maxAccel = SmartDashboard.getNumber("Max Accel", 0);
+    double maxAccel = SmartDashboard.getNumber("Max Accel", 0);*/
 
     if ((p != this.p)) {
       leftPID.setP(p);
@@ -179,30 +164,36 @@ public class Drive extends Subsystem {
     }*/
   }
 
-  public void pidPeriodic() {
+  public void pidOn() {
+    if (!pidEnabled) {
+      pidEnabled = true;
+      leftPID.setIAccum(0);
+      rightPID.setIAccum(0);
+    }
+  }
+
+  public void pidOff() {
+    pidEnabled = false;
+  }
+
+  private void pidPeriodic() {
     setpoint = SmartDashboard.getNumber("Setpoint", 0);
     leftPID.setReference(setpoint, ControlType.kVelocity);
     rightPID.setReference(setpoint, ControlType.kVelocity);
   }
 
-  public void resetEncoder(){
-    rightEncoder.setPosition(0);
-    leftEncoder.setPosition(0);
+  public void setMotorIdleMode(IdleMode mode) {
+    leftMaster.setIdleMode(mode);
+    leftFollowerA.setIdleMode(mode);
+
+    rightMaster.setIdleMode(mode);
+    rightFollowerA.setIdleMode(mode);
   }
 
-  public void setMotorsToCoastMode() {
-    rightMaster.setIdleMode(IdleMode.kCoast);
-    rightFollowerA.setIdleMode(IdleMode.kCoast);
-
-    leftMaster.setIdleMode(IdleMode.kCoast);
-    leftFollowerA.setIdleMode(IdleMode.kCoast);
-  }
-
-  public void setMotorsToBrakeMode() {
-    rightMaster.setIdleMode(IdleMode.kBrake);
-    rightFollowerA.setIdleMode(IdleMode.kBrake);
-
-    leftMaster.setIdleMode(IdleMode.kBrake);
-    leftFollowerA.setIdleMode(IdleMode.kBrake);
+  @Override
+  public void periodic() {
+    if (pidEnabled) {
+      pidPeriodic();
+    }
   }
 }

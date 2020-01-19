@@ -115,8 +115,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     super.teleopInit();
-    drive.resetEncoder();
   }
+
+  private boolean driveToggle = true;
+  private boolean drXPast = false;
+
   /**
    * This function is called periodically during operator control.
    */
@@ -125,13 +128,24 @@ public class Robot extends TimedRobot {
     Scheduler.getInstance().run();
     updateDashboard();
 
-    boolean pidEnabled = oi.drX.get();
-    if (!pidEnabled) {
+    // Check button state against previous button state
+    boolean drXCurrent = oi.drX.get();
+    if (!drXPast && drXCurrent) {
+      driveToggle = !driveToggle;
+
+      if (!driveToggle) {
+        drive.pidOn();
+      } else {
+        drive.pidOff();
+      }
+      
+      drXPast = drXCurrent;
+    }
+
+    if (driveToggle) {
       double power = oi.getDriverStick().getRawAxis(OI.JOYSTICK_LEFT_Y);
       double turn = oi.getDriverStick().getRawAxis(OI.JOYSTICK_RIGHT_X);
       drive.arcadeDrive(power, turn);
-    } else {
-      drive.pidPeriodic();
     }
   }
 
