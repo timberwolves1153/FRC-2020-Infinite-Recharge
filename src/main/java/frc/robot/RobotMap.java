@@ -24,4 +24,8 @@ public class RobotMap {
 	// Shooter Neos
 	public static final int SHOOTER_MOTOR_A = 8;
 	public static final int SHOOTER_MOTOR_B = 9;
+
+	// Flying V Talons
+	public static final int V_INDEX_MOTOR_A = 10;
+	public static final int V_INDEX_MOTOR_B = 11;
 }
