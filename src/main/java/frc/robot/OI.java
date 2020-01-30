@@ -8,19 +8,16 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.buttons.Button;
-import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import frc.robot.commands.AuxMotorBackward;
-import frc.robot.commands.AuxMotorForward;
-import frc.robot.commands.AuxMotorStop;
-import frc.robot.commands.ShooterShootCommand;
-import frc.robot.commands.ShooterStopCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class OI {
 
+    // Joystick Positions
     private static final int DRIVER_JOYSTICK = 0;
     private static final int OPERATOR_STICK = 1;
 
+    // Axis IDs
     public static final int JOYSTICK_LEFT_Y = 1;
 	public static final int JOYSTICK_RIGHT_X = 4;
 	public static final int JOYSTICK_RIGHT_Y = 5;
@@ -30,22 +27,22 @@ public class OI {
     private Joystick opStick = new Joystick(OPERATOR_STICK);
     private Joystick driverStick = new Joystick(DRIVER_JOYSTICK);
 
-    public Button drA = new JoystickButton(driverStick, 1);
-    public Button drB = new JoystickButton(driverStick, 2);
-    public edu.wpi.first.wpilibj2.command.button.Button drX = new edu.wpi.first.wpilibj2.command.button.JoystickButton(driverStick, 3);
-    public edu.wpi.first.wpilibj2.command.button.Button drY = new edu.wpi.first.wpilibj2.command.button.JoystickButton(driverStick, 4);
+    private JoystickButton drA = new JoystickButton(driverStick, 1);
+    private JoystickButton drB = new JoystickButton(driverStick, 2);
+    public JoystickButton drX = new JoystickButton(driverStick, 3);
+    public JoystickButton drY = new JoystickButton(driverStick, 4);
 
     public OI() {
         // Register all button-command associations here
-        drA.whenPressed(new AuxMotorForward());
-        drA.whenReleased(new AuxMotorStop());
-        drB.whenPressed(new AuxMotorBackward());
-        drB.whenReleased(new AuxMotorStop());
+        drA.whenActive(new InstantCommand(Robot.auxMotor::fullForward)); // Per docs, whenActive() is functionally idential to whenPressed()
+        drA.whenInactive(new InstantCommand(Robot.auxMotor::stop)); // whenInactive() is functionally idential to whenReleased()
+        drB.whenActive(new InstantCommand(Robot.auxMotor::fullBackward));
+        drB.whenInactive(new InstantCommand(Robot.auxMotor::stop));
         
-        drX.whenPressed(new ShooterShootCommand(1));
-        drX.whenReleased(new ShooterStopCommand());
-        drY.whenPressed(new ShooterShootCommand(0.5));
-        drY.whenReleased(new ShooterStopCommand());
+        /*drX.whenActive(new VIndexStartCommand(1));
+        drX.whenInactive(new VIndexStopCommand());
+        drY.whenActive(new VIndexStartCommand(0.5));
+        drY.whenInactive(new VIndexStopCommand());*/
     }
 
     public Joystick getOpStick() {

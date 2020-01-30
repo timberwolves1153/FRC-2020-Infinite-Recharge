@@ -10,13 +10,13 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
 /**
  * Add your docs here.
  */
-public class AuxMotor extends Subsystem {
+public class AuxMotor extends SubsystemBase {
   // Put methods for controlling this subsystem
   // here. Call these from Commands.
 
@@ -24,12 +24,6 @@ public class AuxMotor extends Subsystem {
 
   public AuxMotor() {
     motor = new TalonSRX(RobotMap.AUX_MOTOR);
-  }
-
-  @Override
-  public void initDefaultCommand() {
-    // Set the default command for a subsystem here.
-    // setDefaultCommand(new MySpecialCommand());
   }
 
   public void fullForward() {

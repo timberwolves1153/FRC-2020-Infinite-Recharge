@@ -10,19 +10,22 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
 
-public class ShooterStopCommand extends CommandBase {
+public class VIndexStartCommand extends CommandBase {
   /**
-   * Creates a new ShooterStopCommand.
+   * Creates a new ShooterShootCommand.
    */
-  public ShooterStopCommand() {
+  private double wheelSpeed;
+  
+  public VIndexStartCommand(double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(Robot.shooter);
+    wheelSpeed = speed;
+    addRequirements(Robot.indexer);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Robot.shooter.stop();
+    Robot.indexer.setSpeed(wheelSpeed);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

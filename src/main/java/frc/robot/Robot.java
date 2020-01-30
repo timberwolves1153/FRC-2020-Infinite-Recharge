@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.AuxMotor;
 import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -37,7 +38,8 @@ public class Robot extends TimedRobot {
   public static OI oi;
   public static Drive drive;
   public static AuxMotor auxMotor;
-  public static Shooter shooter;
+  //public static Shooter shooter;
+  public static Indexer indexer;
 
   public static ColorSensor colorSensor;
 
@@ -52,7 +54,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
     drive = new Drive();
     auxMotor = new AuxMotor();
-    shooter = new Shooter();
+    //shooter = new Shooter();
+    indexer = new Indexer();
     oi = new OI();
     colorSensor = new ColorSensor();
   }
@@ -129,7 +132,9 @@ public class Robot extends TimedRobot {
     updateDashboard();
 
     // Check button state against previous button state
-    boolean drXCurrent = oi.drX.get();
+    //boolean drXCurrent = oi.drX.get();
+    // TODO: Change button address, see conflict in OI.java for Shooter control
+    boolean drXCurrent = false;
     if (!drXPast && drXCurrent) {
       driveToggle = !driveToggle;
 
@@ -145,7 +150,15 @@ public class Robot extends TimedRobot {
     if (driveToggle) {
       double power = oi.getDriverStick().getRawAxis(OI.JOYSTICK_LEFT_Y);
       double turn = oi.getDriverStick().getRawAxis(OI.JOYSTICK_RIGHT_X);
-      drive.arcadeDrive(power, turn);
+      drive.arcadeDrive(power, -turn);
+    }
+
+    if (oi.getDriverStick().getRawButton(5)) {
+      auxMotor.fullForward();
+    } else if (oi.getDriverStick().getRawButton(6)) {
+      auxMotor.fullBackward();
+    } else {
+      auxMotor.stop();
     }
   }
 
