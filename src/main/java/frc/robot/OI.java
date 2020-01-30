@@ -27,17 +27,19 @@ public class OI {
     private Joystick opStick = new Joystick(OPERATOR_STICK);
     private Joystick driverStick = new Joystick(DRIVER_JOYSTICK);
 
-    private JoystickButton drA = new JoystickButton(driverStick, 1);
-    private JoystickButton drB = new JoystickButton(driverStick, 2);
+    //private JoystickButton drA = new JoystickButton(driverStick, 1);
+    //private JoystickButton drB = new JoystickButton(driverStick, 2);
     public JoystickButton drX = new JoystickButton(driverStick, 3);
     public JoystickButton drY = new JoystickButton(driverStick, 4);
+    public JoystickButton drBumpLeft = new JoystickButton(driverStick, 5);
+    public JoystickButton drBumpRight = new JoystickButton(driverStick, 6);
 
     public OI() {
         // Register all button-command associations here
-        drA.whenActive(new InstantCommand(Robot.auxMotor::fullForward)); // Per docs, whenActive() is functionally idential to whenPressed()
-        drA.whenInactive(new InstantCommand(Robot.auxMotor::stop)); // whenInactive() is functionally idential to whenReleased()
-        drB.whenActive(new InstantCommand(Robot.auxMotor::fullBackward));
-        drB.whenInactive(new InstantCommand(Robot.auxMotor::stop));
+        drBumpLeft.whenActive(new InstantCommand(Robot.auxMotor::fullForward)); // Per docs, whenActive() is functionally idential to whenPressed()
+        drBumpLeft.whenInactive(new InstantCommand(Robot.auxMotor::stop)); // whenInactive() is functionally idential to whenReleased()
+        drBumpRight.whenActive(new InstantCommand(Robot.auxMotor::fullBackward));
+        drBumpRight.whenInactive(new InstantCommand(Robot.auxMotor::stop));
         
         /*drX.whenActive(new VIndexStartCommand(1));
         drX.whenInactive(new VIndexStopCommand());
