@@ -153,13 +153,13 @@ public class Robot extends TimedRobot {
       drive.arcadeDrive(power, -turn);
     }
 
-    if (oi.getDriverStick().getRawButton(5)) {
+    /*if (oi.getDriverStick().getRawButton(5)) {
       auxMotor.fullForward();
     } else if (oi.getDriverStick().getRawButton(6)) {
       auxMotor.fullBackward();
     } else {
       auxMotor.stop();
-    }
+    }*/
   }
 
   /**
