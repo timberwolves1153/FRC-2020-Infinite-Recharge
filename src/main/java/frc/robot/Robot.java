@@ -7,17 +7,13 @@
 
 package frc.robot;
 
-import com.revrobotics.ColorSensorV3;
-
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.AuxMotor;
 import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Indexer;
-import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.command.Command;
 
 
@@ -37,7 +33,6 @@ public class Robot extends TimedRobot {
 
   public static OI oi;
   public static Drive drive;
-  public static AuxMotor auxMotor;
   //public static Shooter shooter;
   public static Indexer indexer;
 
@@ -53,11 +48,10 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
     drive = new Drive();
-    auxMotor = new AuxMotor();
     //shooter = new Shooter();
     indexer = new Indexer();
-    oi = new OI();
     colorSensor = new ColorSensor();
+    oi = new OI();
   }
 
   private void updateDashboard(){
@@ -154,11 +148,11 @@ public class Robot extends TimedRobot {
     }
 
     /*if (oi.getDriverStick().getRawButton(5)) {
-      auxMotor.fullForward();
+      indexer.collect();
     } else if (oi.getDriverStick().getRawButton(6)) {
-      auxMotor.fullBackward();
+      indexer.disperse();
     } else {
-      auxMotor.stop();
+      indexer.stop();
     }*/
   }
 

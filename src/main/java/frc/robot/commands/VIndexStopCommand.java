@@ -22,7 +22,7 @@ public class VIndexStopCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Robot.indexer.setSpeed(0);
+    Robot.indexer.setVIndexerSpeed(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

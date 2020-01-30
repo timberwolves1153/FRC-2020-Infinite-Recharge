@@ -15,6 +15,8 @@ import frc.robot.RobotMap;
 
 public class Indexer extends SubsystemBase {
 
+  private TalonSRX collectRoller;
+
   private TalonSRX vIndexA;
   private TalonSRX vIndexB;
 
@@ -22,6 +24,7 @@ public class Indexer extends SubsystemBase {
    * Creates a new Indexer.
    */
   public Indexer() {
+    collectRoller = new TalonSRX(RobotMap.COLLECT_ROLLER_MOTOR);
     vIndexA = new TalonSRX(RobotMap.V_INDEX_MOTOR_A);
     vIndexB = new TalonSRX(RobotMap.V_INDEX_MOTOR_B);
 
@@ -32,12 +35,19 @@ public class Indexer extends SubsystemBase {
     vIndexB.follow(vIndexA);
   }
 
-  public void setSpeed(double speed) {
+  public void setVIndexerSpeed(double speed) {
     vIndexA.set(ControlMode.PercentOutput, speed);
   }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+  public void collect() {
+    collectRoller.set(ControlMode.PercentOutput, 1);
+  }
+
+  public void dispense() {
+    collectRoller.set(ControlMode.PercentOutput, -1);
+  }
+
+  public void stop() {
+    collectRoller.set(ControlMode.PercentOutput, 0);
   }
 }
