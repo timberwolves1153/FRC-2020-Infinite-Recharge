@@ -8,6 +8,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
@@ -21,11 +22,20 @@ public class Shooter extends SubsystemBase {
     motorA = new CANSparkMax(RobotMap.SHOOTER_MOTOR_A, CANSparkMax.MotorType.kBrushless);
     motorB = new CANSparkMax(RobotMap.SHOOTER_MOTOR_B, CANSparkMax.MotorType.kBrushless);
 
-    configMasterSparks();
+    configSparkParams();
   }
 
-  private void configMasterSparks() {
+  private void configSparkParams() {
+    motorA.restoreFactoryDefaults();
+    motorB.restoreFactoryDefaults();
+
+    motorA.setIdleMode(IdleMode.kCoast);
+    motorB.setIdleMode(IdleMode.kCoast);
+
     motorB.follow(motorA);
+
+    motorA.burnFlash();
+    motorB.burnFlash();
   }
 
   public void setSpeed(double speed) {
