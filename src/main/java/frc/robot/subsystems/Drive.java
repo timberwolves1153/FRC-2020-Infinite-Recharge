@@ -63,21 +63,25 @@ public class Drive extends SubsystemBase {
     leftPID = leftMaster.getPIDController();
     rightPID = rightMaster.getPIDController();
 
-    configMasterSparks();
-    configMotionProfiling();
+    configSparkParams();
 
     differentialDrive = new DifferentialDrive(leftMaster, rightMaster);
   }
 
-  private void configMasterSparks() {
-    leftFollowerA.follow(leftMaster);
-    rightFollowerA.follow(rightMaster);
-  }
-
-  private void configMotionProfiling() {
+  private void configSparkParams() {
     // Following reset is a soft reset and does not persist between power cycles
     leftMaster.restoreFactoryDefaults();
     rightMaster.restoreFactoryDefaults();
+
+    //Config Master Sparks
+    leftFollowerA.follow(leftMaster);
+    rightFollowerA.follow(rightMaster);
+
+    //Sets default brake mode
+    leftMaster.setIdleMode(IdleMode.kBrake);
+    rightMaster.setIdleMode(IdleMode.kBrake);
+    leftFollowerA.setIdleMode(IdleMode.kBrake);
+    rightFollowerA.setIdleMode(IdleMode.kBrake);
 
     // Velocity Regulation PID constants
     p = 0.0000036902;
@@ -99,6 +103,12 @@ public class Drive extends SubsystemBase {
     SmartDashboard.putNumber("Min Output Velocity", minOutputVelocity);
     SmartDashboard.putNumber("Max Accel", maxAccel);
     SmartDashboard.putNumber("Setpoint", setpoint);
+
+    //Save Config Settings
+    leftMaster.burnFlash();
+    rightMaster.burnFlash();
+    leftFollowerA.burnFlash();
+    rightFollowerA.burnFlash();
   }
 
   private void setupPIDConstants(CANPIDController a, double p, double i, double d) {
