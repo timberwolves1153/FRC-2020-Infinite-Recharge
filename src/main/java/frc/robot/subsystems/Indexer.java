@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
@@ -20,6 +21,9 @@ public class Indexer extends SubsystemBase {
   private TalonSRX vIndexA;
   private TalonSRX vIndexB;
 
+  private boolean vIndexState = false;
+  private double vIndexSpeed = 0.5;
+
   /**
    * Creates a new Indexer.
    */
@@ -29,14 +33,32 @@ public class Indexer extends SubsystemBase {
     vIndexB = new TalonSRX(RobotMap.V_INDEX_MOTOR_B);
 
     configMaster();
+
+    SmartDashboard.putNumber("V Indexer Speed", vIndexSpeed);
+  }
+
+  public void updateDashboard() {
+    double vIndexSpeed = SmartDashboard.getNumber("V Indexer Speed", 0);
+    if (vIndexSpeed != this.vIndexSpeed) {
+      if (vIndexState) {
+        vIndexA.set(ControlMode.PercentOutput, vIndexSpeed);
+      }
+      this.vIndexSpeed = vIndexSpeed;
+    }
   }
 
   private void configMaster() {
     vIndexB.follow(vIndexA);
   }
 
-  public void setVIndexerSpeed(double speed) {
-    vIndexA.set(ControlMode.PercentOutput, speed);
+  public void startVIndexer() {
+    vIndexState = true;
+    vIndexA.set(ControlMode.PercentOutput, vIndexSpeed);
+  }
+
+  public void stopVIndexer() {
+    vIndexState = false;
+    vIndexA.set(ControlMode.PercentOutput, 0);
   }
 
   public void collect() {

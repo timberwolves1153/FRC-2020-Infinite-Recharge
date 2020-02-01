@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
   private void updateDashboard(){
     drive.updateDashboard();
     colorSensor.updateShuffleboard();
+    indexer.updateDashboard();
   }
 
   /**

@@ -41,10 +41,8 @@ public class OI {
         drBumpRight.whenActive(new InstantCommand(Robot.indexer::dispense, Robot.indexer));
         drBumpRight.whenInactive(new InstantCommand(Robot.indexer::stop, Robot.indexer));
         
-        /*drX.whenActive(new VIndexStartCommand(1));
-        drX.whenInactive(new VIndexStopCommand());
-        drY.whenActive(new VIndexStartCommand(0.5));
-        drY.whenInactive(new VIndexStopCommand());*/
+        drX.whenActive(new InstantCommand(Robot.indexer::startVIndexer, Robot.indexer));
+        drX.whenInactive(new InstantCommand(Robot.indexer::stopVIndexer, Robot.indexer));
     }
 
     public Joystick getOpStick() {
