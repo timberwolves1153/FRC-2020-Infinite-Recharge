@@ -36,10 +36,10 @@ public class OI {
 
     public OI() {
         // Register all button-command associations here
-        drBumpLeft.whenActive(new InstantCommand(Robot.indexer::collect)); // Per docs, whenActive() is functionally idential to whenPressed()
-        drBumpLeft.whenInactive(new InstantCommand(Robot.indexer::stop)); // whenInactive() is functionally idential to whenReleased()
-        drBumpRight.whenActive(new InstantCommand(Robot.indexer::dispense));
-        drBumpRight.whenInactive(new InstantCommand(Robot.indexer::stop));
+        drBumpLeft.whenActive(new InstantCommand(Robot.indexer::collect, Robot.indexer)); // Per docs, whenActive() is functionally idential to whenPressed()
+        drBumpLeft.whenInactive(new InstantCommand(Robot.indexer::stop, Robot.indexer)); // whenInactive() is functionally idential to whenReleased()
+        drBumpRight.whenActive(new InstantCommand(Robot.indexer::dispense, Robot.indexer));
+        drBumpRight.whenInactive(new InstantCommand(Robot.indexer::stop, Robot.indexer));
         
         /*drX.whenActive(new VIndexStartCommand(1));
         drX.whenInactive(new VIndexStopCommand());
