@@ -148,13 +148,19 @@ public class Robot extends TimedRobot {
       drive.arcadeDrive(power, -turn);
     }
 
-    /*if (oi.getDriverStick().getRawButton(5)) {
+    if (oi.getDriverStick().getRawButton(5)) {
       indexer.collect();
     } else if (oi.getDriverStick().getRawButton(6)) {
-      indexer.disperse();
+      indexer.dispense();
     } else {
       indexer.stop();
-    }*/
+    }
+
+    if(oi.getDriverStick().getRawButton(3)) {
+      indexer.startVIndexer();
+    } else {
+      indexer.stopVIndexer();
+    }
   }
 
   /**
