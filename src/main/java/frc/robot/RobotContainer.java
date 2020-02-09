@@ -45,6 +45,8 @@ public class RobotContainer {
     private JoystickButton opStart;
     private JoystickButton opBack;
 
+    public int teleOpDriveSide;
+
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
@@ -66,6 +68,8 @@ public class RobotContainer {
     opBumpRight = new JoystickButton(operator, XboxController.Button.kBumperRight.value);
     opStart = new JoystickButton(operator, XboxController.Button.kStart.value);
     opBack = new JoystickButton(operator, XboxController.Button.kBack.value);
+
+    teleOpDriveSide = -1;
 
     // Configure the button bindings
     configureButtonBindings();
@@ -110,6 +114,14 @@ public class RobotContainer {
     drive.updateDashboard();
     colorSensor.updateShuffleboard();
     indexer.updateDashboard();
+  }
+
+  public XboxController getDriveStick() {
+    return driver;
+  }
+
+  public XboxController getOpStick() {
+    return operator;
   }
 
   /**

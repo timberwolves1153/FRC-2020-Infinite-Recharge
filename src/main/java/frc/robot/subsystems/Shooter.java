@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 
@@ -45,10 +46,12 @@ public class Shooter extends SubsystemBase {
 
   public void setSpeed(double speed) {
     motorA.set(speed);
+    accelerator.set(0.5);
   }
 
   public void stop(){
     motorA.set(0);
+    accelerator.set(0);
   }
 
   @Override

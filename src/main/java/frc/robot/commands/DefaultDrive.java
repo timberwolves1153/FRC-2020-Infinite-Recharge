@@ -10,6 +10,7 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.Drive;
 
 public class DefaultDrive extends CommandBase {
@@ -17,6 +18,8 @@ public class DefaultDrive extends CommandBase {
   private Drive drive;
   private DoubleSupplier power;
   private DoubleSupplier turn;
+
+  private boolean mLastToggleState = false;
 
   /**
    * Creates a new DefaultDrive.
@@ -37,7 +40,12 @@ public class DefaultDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.arcadeDrive(-power.getAsDouble(), -turn.getAsDouble());
+    boolean bothPressed = Robot.m_robotContainer.getDriveStick().getRawButtonPressed(6);
+    if(bothPressed && !mLastToggleState) {
+      Robot.m_robotContainer.teleOpDriveSide = Robot.m_robotContainer.teleOpDriveSide > 0 ? -1 : 1;
+    }
+    mLastToggleState = bothPressed;
+    drive.arcadeDrive(Robot.m_robotContainer.teleOpDriveSide * power.getAsDouble(), -turn.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
