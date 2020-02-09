@@ -13,19 +13,30 @@ package frc.robot;
 public class RobotMap {
 
     // Drivetrain Neos
-	public static final int LEFT_MASTER = 1;
-	public static final int LEFT_FOLLOWER_A = 2;
-	public static final int RIGHT_MASTER = 4;
-	public static final int RIGHT_FOLLOWER_A = 5;
+	public static final int LEFT_MASTER = 15;
+	public static final int LEFT_FOLLOWER_A = 14;
+	public static final int RIGHT_MASTER = 20;
+	public static final int RIGHT_FOLLOWER_A = 1;
 
-	// Auxillary Talon
-	public static final int COLLECT_ROLLER_MOTOR = 7;
+	// Collector
+	public static final int INSIDE_COLLECT_ROLLER_MOTOR = 4;
+	public static final int OUTSIDE_COLLECT_ROLLER_MOTOR = 8;
 
 	// Shooter Neos
-	public static final int SHOOTER_MOTOR_A = 8;
-	public static final int SHOOTER_MOTOR_B = 9;
+	public static final int SHOOTER_MOTOR_A = 13;
+	public static final int SHOOTER_MOTOR_B = 2;
+	public static final int ACCELERATOR = 3;
 
 	// Flying V Talons
-	public static final int V_INDEX_MOTOR_A = 10;
-	public static final int V_INDEX_MOTOR_B = 11;
+	public static final int V_INDEX_MOTOR_A = 11;
+	public static final int V_INDEX_MOTOR_B = 10;
+
+	// Climber
+	public static final int WINCH = 12;
+	public static final int HOOK = 5;
+
+	// Color Wheel
+	public static final int COLOR_WHEEL = 9;
+
+
 }

@@ -8,7 +8,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,10 +16,11 @@ import frc.robot.RobotMap;
 
 public class Indexer extends SubsystemBase {
 
-  private TalonSRX collectRoller;
+  private VictorSPX insideCollectRoller;
+  private VictorSPX outsideCollectRoller;
 
-  private TalonSRX vIndexA;
-  private TalonSRX vIndexB;
+  private VictorSPX vIndexA;
+  private VictorSPX vIndexB;
 
   private boolean vIndexState = false;
   private double vIndexSpeed = 0.5;
@@ -28,9 +29,10 @@ public class Indexer extends SubsystemBase {
    * Creates a new Indexer.
    */
   public Indexer() {
-    collectRoller = new TalonSRX(RobotMap.COLLECT_ROLLER_MOTOR);
-    vIndexA = new TalonSRX(RobotMap.V_INDEX_MOTOR_A);
-    vIndexB = new TalonSRX(RobotMap.V_INDEX_MOTOR_B);
+    insideCollectRoller = new VictorSPX(RobotMap.INSIDE_COLLECT_ROLLER_MOTOR);
+    outsideCollectRoller = new VictorSPX(RobotMap.OUTSIDE_COLLECT_ROLLER_MOTOR);
+    vIndexA = new VictorSPX(RobotMap.V_INDEX_MOTOR_A);
+    vIndexB = new VictorSPX(RobotMap.V_INDEX_MOTOR_B);
 
     configMaster();
 
@@ -62,14 +64,26 @@ public class Indexer extends SubsystemBase {
   }
 
   public void collect() {
-    collectRoller.set(ControlMode.PercentOutput, 1);
+    insideCollectRoller.set(ControlMode.PercentOutput, -1);
   }
 
   public void dispense() {
-    collectRoller.set(ControlMode.PercentOutput, -1);
+    insideCollectRoller.set(ControlMode.PercentOutput, 1);
   }
 
   public void stop() {
-    collectRoller.set(ControlMode.PercentOutput, 0);
+    insideCollectRoller.set(ControlMode.PercentOutput, 0);
+  }
+
+  public void outsideCollect() {
+    outsideCollectRoller.set(ControlMode.PercentOutput, 1);
+  }
+
+  public void outsideDispense() {
+    outsideCollectRoller.set(ControlMode.PercentOutput, -1);
+  }
+
+  public void outsideStop() {
+    outsideCollectRoller.set(ControlMode.PercentOutput, 0);
   }
 }

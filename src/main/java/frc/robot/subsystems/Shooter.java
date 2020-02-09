@@ -17,10 +17,12 @@ public class Shooter extends SubsystemBase {
   
   private CANSparkMax motorA;
   private CANSparkMax motorB;
+  private CANSparkMax accelerator;
 
   public Shooter() {
     motorA = new CANSparkMax(RobotMap.SHOOTER_MOTOR_A, CANSparkMax.MotorType.kBrushless);
     motorB = new CANSparkMax(RobotMap.SHOOTER_MOTOR_B, CANSparkMax.MotorType.kBrushless);
+    accelerator = new CANSparkMax(RobotMap.ACCELERATOR, CANSparkMax.MotorType.kBrushless);
 
     configSparkParams();
   }
@@ -28,14 +30,17 @@ public class Shooter extends SubsystemBase {
   private void configSparkParams() {
     motorA.restoreFactoryDefaults();
     motorB.restoreFactoryDefaults();
+    accelerator.restoreFactoryDefaults();
 
     motorA.setIdleMode(IdleMode.kCoast);
     motorB.setIdleMode(IdleMode.kCoast);
+    accelerator.setIdleMode(IdleMode.kCoast);
 
     motorB.follow(motorA);
 
     motorA.burnFlash();
     motorB.burnFlash();
+    accelerator.burnFlash();
   }
 
   public void setSpeed(double speed) {

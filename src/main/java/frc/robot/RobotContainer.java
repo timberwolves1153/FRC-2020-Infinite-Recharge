@@ -13,9 +13,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DefaultDrive;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.Shooter;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -26,34 +28,44 @@ import frc.robot.subsystems.Indexer;
 public class RobotContainer {
 
     private Drive drive;
-    //private Shooter shooter;
+    private Shooter shooter;
     private Indexer indexer;
     private ColorSensor colorSensor;
+    private Climber climber;
 
     private XboxController driver;
     private XboxController operator;
 
     private JoystickButton opX;
     private JoystickButton opY;
+    private JoystickButton opA;
+    private JoystickButton opB;
     private JoystickButton opBumpLeft;
     private JoystickButton opBumpRight;
+    private JoystickButton opStart;
+    private JoystickButton opBack;
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     drive = new Drive();
-    //shooter = new Shooter();
+    shooter = new Shooter();
     indexer = new Indexer();
     colorSensor = new ColorSensor();
+    climber = new Climber();
 
     driver = new XboxController(0);
     operator = new XboxController(1);
 
     opX = new JoystickButton(operator, XboxController.Button.kX.value);
     opY = new JoystickButton(operator, XboxController.Button.kY.value);
+    opA = new JoystickButton(operator, XboxController.Button.kA.value);
+    opB = new JoystickButton(operator, XboxController.Button.kB.value);
     opBumpLeft = new JoystickButton(operator, XboxController.Button.kBumperLeft.value);
     opBumpRight = new JoystickButton(operator, XboxController.Button.kBumperRight.value);
+    opStart = new JoystickButton(operator, XboxController.Button.kStart.value);
+    opBack = new JoystickButton(operator, XboxController.Button.kBack.value);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -77,6 +89,21 @@ public class RobotContainer {
     
     opX.whenPressed(new InstantCommand(indexer::startVIndexer, indexer));
     opX.whenReleased(new InstantCommand(indexer::stopVIndexer, indexer));
+
+    opY.whenPressed(new InstantCommand(() -> shooter.setSpeed(1), shooter));
+    opY.whenReleased(new InstantCommand(() -> shooter.setSpeed(0), shooter));
+
+    opA.whenPressed(new InstantCommand(indexer::outsideCollect, indexer));
+    opA.whenReleased(new InstantCommand(indexer::outsideStop, indexer));
+
+    opB.whenPressed(new InstantCommand(indexer::outsideDispense, indexer));
+    opB.whenReleased(new InstantCommand(indexer::outsideStop, indexer));
+
+    opStart.whenPressed(new InstantCommand(climber::climb, climber));
+    opStart.whenReleased(new InstantCommand(climber::stop, climber));
+
+    opBack.whenPressed(new InstantCommand(climber::hookEnable, climber));
+    opBack.whenReleased(new InstantCommand(climber::hookDisable, climber));
   }
 
   public void updateDashboard() {
