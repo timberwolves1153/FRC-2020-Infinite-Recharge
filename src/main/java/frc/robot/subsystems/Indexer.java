@@ -71,6 +71,10 @@ public class Indexer extends SubsystemBase {
     insideCollectRoller.set(ControlMode.PercentOutput, 1);
   }
 
+  public void kick() {
+    insideCollectRoller.set(ControlMode.PercentOutput, -.5);
+  }
+
   public void stop() {
     insideCollectRoller.set(ControlMode.PercentOutput, 0);
   }

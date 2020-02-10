@@ -92,9 +92,11 @@ public class RobotContainer {
     opBumpRight.whenReleased(new InstantCommand(indexer::stop, indexer));
     
     opX.whenPressed(new InstantCommand(indexer::startVIndexer, indexer));
+    opX.whenPressed(new InstantCommand(indexer::kick, indexer));
     opX.whenReleased(new InstantCommand(indexer::stopVIndexer, indexer));
+    opX.whenReleased(new InstantCommand(indexer::stop, indexer));
 
-    opY.whenPressed(new InstantCommand(() -> shooter.setSpeed(1), shooter));
+    opY.whenPressed(new InstantCommand(() -> shooter.setSpeed(.5), shooter));
     opY.whenReleased(new InstantCommand(() -> shooter.setSpeed(0), shooter));
 
     opA.whenPressed(new InstantCommand(indexer::outsideCollect, indexer));
@@ -103,8 +105,11 @@ public class RobotContainer {
     opB.whenPressed(new InstantCommand(indexer::outsideDispense, indexer));
     opB.whenReleased(new InstantCommand(indexer::outsideStop, indexer));
 
-    opStart.whenPressed(new InstantCommand(climber::climb, climber));
-    opStart.whenReleased(new InstantCommand(climber::stop, climber));
+//    opStart.whenPressed(new InstantCommand(climber::climb, climber));
+//    opStart.whenReleased(new InstantCommand(climber::stop, climber));
+
+    opStart.whenPressed(new InstantCommand(() -> shooter.setAcceleratorSpeed(-1), shooter));
+    opStart.whenReleased(new InstantCommand(() -> shooter.setAcceleratorSpeed(0), shooter));
 
     opBack.whenPressed(new InstantCommand(climber::hookEnable, climber));
     opBack.whenReleased(new InstantCommand(climber::hookDisable, climber));
