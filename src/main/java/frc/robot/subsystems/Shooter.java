@@ -7,10 +7,13 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANPIDController;
 //import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
@@ -20,10 +23,21 @@ public class Shooter extends SubsystemBase {
   private CANSparkMax motorB;
   private CANSparkMax accelerator;
 
+  private CANPIDController shooterPID;
+
+  private boolean pidEnabled = false;
+
+  private double p, i, d, setpoint;
+
+  private static final double MAX_OUTPUT = 1;
+  private static final double MIN_OUTPUT = -1;
+
   public Shooter() {
     motorA = new CANSparkMax(RobotMap.SHOOTER_MOTOR_A, CANSparkMax.MotorType.kBrushless);
     motorB = new CANSparkMax(RobotMap.SHOOTER_MOTOR_B, CANSparkMax.MotorType.kBrushless);
     accelerator = new CANSparkMax(RobotMap.ACCELERATOR, CANSparkMax.MotorType.kBrushless);
+
+    shooterPID = motorA.getPIDController();
 
     configSparkParams();
   }
@@ -39,9 +53,63 @@ public class Shooter extends SubsystemBase {
 
     motorB.follow(motorA, true);
 
+    p = 0;
+    i = 0;
+    d = 0;
+    setpoint = 0;
+
+    setupPIDConstants(shooterPID, p, i, d);
+
+    SmartDashboard.putNumber("Shooter P Gain", p);
+    SmartDashboard.putNumber("Shooter I Gain", i);
+    SmartDashboard.putNumber("Shooter D Gain", d);
+    SmartDashboard.putNumber("Shooter Setpoint", setpoint);
+
     motorA.burnFlash();
     motorB.burnFlash();
     accelerator.burnFlash();
+  }
+
+  public void updateDashboard() {
+    double p = SmartDashboard.getNumber("Shooter P Gain", 0);
+    double i = SmartDashboard.getNumber("Shooter I Gain", 0);
+    double d = SmartDashboard.getNumber("Shooter D Gain", 0);
+
+    if ((p != this.p)) {
+      shooterPID.setP(p);
+      this.p = p;
+    }
+    if ((i != this.i)) {
+      shooterPID.setI(i);
+      this.i = i;
+    }
+    if ((d != this.d)) {
+      shooterPID.setD(d);
+      this.d = d;
+    }
+  }
+
+  private void setupPIDConstants(CANPIDController a, double p, double i, double d) {
+    a.setP(p);
+    a.setI(i);
+    a.setD(d);
+    a.setOutputRange(MIN_OUTPUT, MAX_OUTPUT);
+  }
+
+  public void pidOn() {
+    if (!pidEnabled) {
+      pidEnabled = true;
+      shooterPID.setIAccum(0);
+    }
+  }
+
+  public void pidOff() {
+    pidEnabled = false;
+  }
+
+  private void pidPeriodic() {
+    setpoint = SmartDashboard.getNumber("Shooter Setpoint", 0);
+    shooterPID.setReference(setpoint, ControlType.kVelocity);
   }
 
   public void setSpeed(double speed) {
@@ -60,6 +128,8 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    if (pidEnabled) {
+      pidPeriodic();
+    }
   }
 }

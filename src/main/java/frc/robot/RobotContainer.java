@@ -13,10 +13,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DefaultDrive;
+import frc.robot.commands.TurnWithLimelight;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -32,6 +34,7 @@ public class RobotContainer {
     private Indexer indexer;
     private ColorSensor colorSensor;
     private Climber climber;
+    private LimelightVision vision;
 
     private XboxController driver;
     private XboxController operator;
@@ -56,6 +59,7 @@ public class RobotContainer {
     indexer = new Indexer();
     colorSensor = new ColorSensor();
     climber = new Climber();
+    vision = new LimelightVision();
 
     driver = new XboxController(0);
     operator = new XboxController(1);
@@ -110,15 +114,19 @@ public class RobotContainer {
 
     opStart.whenPressed(new InstantCommand(() -> shooter.setAcceleratorSpeed(-1), shooter));
     opStart.whenReleased(new InstantCommand(() -> shooter.setAcceleratorSpeed(0), shooter));
-
+    /*
     opBack.whenPressed(new InstantCommand(climber::hookEnable, climber));
     opBack.whenReleased(new InstantCommand(climber::hookDisable, climber));
+    */
+    opBack.whenHeld(new TurnWithLimelight(drive, vision));
+    
   }
 
   public void updateDashboard() {
     drive.updateDashboard();
-    colorSensor.updateShuffleboard();
+    colorSensor.updateDashboard();
     indexer.updateDashboard();
+    shooter.updateDashboard();
   }
 
   public XboxController getDriveStick() {
