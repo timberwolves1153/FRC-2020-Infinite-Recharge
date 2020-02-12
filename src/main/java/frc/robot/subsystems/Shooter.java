@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 //import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax;
@@ -23,11 +24,13 @@ public class Shooter extends SubsystemBase {
   private CANSparkMax motorB;
   private CANSparkMax accelerator;
 
+  private CANEncoder shooterEncoder;
+
   private CANPIDController shooterPID;
 
   private boolean pidEnabled = false;
 
-  private double p, i, d, setpoint;
+  private double p, i, d, f, setpoint;
 
   private static final double MAX_OUTPUT = 1;
   private static final double MIN_OUTPUT = -1;
@@ -36,6 +39,8 @@ public class Shooter extends SubsystemBase {
     motorA = new CANSparkMax(RobotMap.SHOOTER_MOTOR_A, CANSparkMax.MotorType.kBrushless);
     motorB = new CANSparkMax(RobotMap.SHOOTER_MOTOR_B, CANSparkMax.MotorType.kBrushless);
     accelerator = new CANSparkMax(RobotMap.ACCELERATOR, CANSparkMax.MotorType.kBrushless);
+
+    shooterEncoder = motorA.getEncoder();
 
     shooterPID = motorA.getPIDController();
 
@@ -53,16 +58,18 @@ public class Shooter extends SubsystemBase {
 
     motorB.follow(motorA, true);
 
-    p = 0;
+    p = 0.05;
     i = 0;
     d = 0;
+    f = 0.1;
     setpoint = 0;
 
-    setupPIDConstants(shooterPID, p, i, d);
+    setupPIDConstants(shooterPID, p, i, d, f);
 
     SmartDashboard.putNumber("Shooter P Gain", p);
     SmartDashboard.putNumber("Shooter I Gain", i);
     SmartDashboard.putNumber("Shooter D Gain", d);
+    SmartDashboard.putNumber("Shooter F Gain", f);
     SmartDashboard.putNumber("Shooter Setpoint", setpoint);
 
     motorA.burnFlash();
@@ -71,6 +78,9 @@ public class Shooter extends SubsystemBase {
   }
 
   public void updateDashboard() {
+    SmartDashboard.putNumber("Shooter Velocity", shooterEncoder.getVelocity());
+    SmartDashboard.putNumber("Shooter Power", motorA.get());
+
     double p = SmartDashboard.getNumber("Shooter P Gain", 0);
     double i = SmartDashboard.getNumber("Shooter I Gain", 0);
     double d = SmartDashboard.getNumber("Shooter D Gain", 0);
@@ -89,10 +99,11 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  private void setupPIDConstants(CANPIDController a, double p, double i, double d) {
+  private void setupPIDConstants(CANPIDController a, double p, double i, double d, double f) {
     a.setP(p);
     a.setI(i);
     a.setD(d);
+    a.setFF(f);
     a.setOutputRange(MIN_OUTPUT, MAX_OUTPUT);
   }
 
@@ -105,11 +116,13 @@ public class Shooter extends SubsystemBase {
 
   public void pidOff() {
     pidEnabled = false;
+    motorA.set(0);
   }
 
   private void pidPeriodic() {
-    setpoint = SmartDashboard.getNumber("Shooter Setpoint", 0);
-    shooterPID.setReference(setpoint, ControlType.kVelocity);
+    //setpoint = SmartDashboard.getNumber("Shooter Setpoint", 0);
+    shooterPID.setReference(4700, ControlType.kVelocity);
+    System.out.println("Setting setpoint");
   }
 
   public void setSpeed(double speed) {
