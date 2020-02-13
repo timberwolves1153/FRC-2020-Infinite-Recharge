@@ -99,12 +99,15 @@ public class RobotContainer {
     opX.whenPressed(new InstantCommand(indexer::kick, indexer));
     opX.whenReleased(new InstantCommand(indexer::stopVIndexer, indexer));
     opX.whenReleased(new InstantCommand(indexer::stop, indexer));
-    /*
-    opY.whenPressed(new InstantCommand(() -> shooter.setSpeed(0.87), shooter));
+    
+    //67 auto & 87 tele
+    //70 close CP
+    //80 downtown
+    opY.whenPressed(new InstantCommand(() -> shooter.setSpeed(.65), shooter));
     opY.whenReleased(new InstantCommand(() -> shooter.setSpeed(0), shooter));
-    */
-    opY.whenPressed(shooter::pidOn, shooter);
-    opY.whenReleased(shooter::pidOff, shooter);
+    
+    //opY.whenPressed(shooter::pidOn, shooter);
+    //opY.whenReleased(shooter::pidOff, shooter);
     
     opA.whenPressed(new InstantCommand(indexer::outsideCollect, indexer));
     opA.whenReleased(new InstantCommand(indexer::outsideStop, indexer));
