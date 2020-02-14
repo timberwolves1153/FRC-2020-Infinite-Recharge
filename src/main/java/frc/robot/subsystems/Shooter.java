@@ -61,7 +61,7 @@ public class Shooter extends SubsystemBase {
     p = 0.05;
     i = 0;
     d = 0;
-    f = 0.1;
+    f = 0.00018510638;
     setpoint = 0;
 
     setupPIDConstants(shooterPID, p, i, d, f);
@@ -84,6 +84,7 @@ public class Shooter extends SubsystemBase {
     double p = SmartDashboard.getNumber("Shooter P Gain", 0);
     double i = SmartDashboard.getNumber("Shooter I Gain", 0);
     double d = SmartDashboard.getNumber("Shooter D Gain", 0);
+    double f = SmartDashboard.getNumber("Shooter F Gain", 0);
 
     if ((p != this.p)) {
       shooterPID.setP(p);
@@ -96,6 +97,10 @@ public class Shooter extends SubsystemBase {
     if ((d != this.d)) {
       shooterPID.setD(d);
       this.d = d;
+    }
+    if((f != this.f)) {
+      shooterPID.setFF(f);
+      this.f = f;
     }
   }
 

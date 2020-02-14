@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import com.analog.adis16470.frc.ADIS16470_IMU;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
@@ -40,6 +41,8 @@ public class Drive extends SubsystemBase {
   public double p, i, d, setpoint;
   private static final double MAX_OUTPUT = 1;
   private static final double MIN_OUTPUT = -1;
+
+  private static final ADIS16470_IMU imu = new ADIS16470_IMU();
 
   //private static final int SMART_MOTION_SLOT = 0;
   public double maxVelocity, minOutputVelocity, maxAccel;
@@ -184,6 +187,16 @@ public class Drive extends SubsystemBase {
 
   public void pidOff() {
     pidEnabled = false;
+  }
+
+  public double getImuAngle() {
+    return imu.getAngle();
+  }
+  public void calibrateImu() {
+    imu.calibrate();
+  }
+  public void resetImu() {
+    imu.reset();
   }
 
   private void pidPeriodic() {
