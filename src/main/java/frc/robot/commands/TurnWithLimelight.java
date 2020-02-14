@@ -8,6 +8,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.PIDCommand;
+import frc.robot.Robot;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.LimelightVision;
 
@@ -17,6 +18,8 @@ import frc.robot.subsystems.LimelightVision;
 public class TurnWithLimelight extends PIDCommand {
   private boolean canFinishCommand = false;
   private int counter = 1;
+  private double initialGyroAngle;
+
   private Drive drive;
   private LimelightVision vision;
   /**
@@ -38,6 +41,7 @@ public class TurnWithLimelight extends PIDCommand {
     // Configure additional PID options by calling `getController` here.
     getController().setTolerance(5, 5);
     getController().enableContinuousInput(-29.8, 29.8);
+    initialGyroAngle = drive.getImuAngle();
     this.drive = drive;
     this.vision = vision;
   }
@@ -59,5 +63,6 @@ public class TurnWithLimelight extends PIDCommand {
   public void end(boolean interrupted) {
     vision.setPipeline(0);
     drive.arcadeDrive(0, 0);
+    Robot.m_robotContainer.lastLimelightTurnAngleDifference = drive.getImuAngle() - initialGyroAngle;
   }
 }

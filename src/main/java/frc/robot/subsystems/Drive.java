@@ -213,6 +213,14 @@ public class Drive extends SubsystemBase {
     rightFollowerA.setIdleMode(mode);
   }
 
+  public CANEncoder getLeftEncoder() {
+    return leftEncoder;
+  }
+
+  public CANEncoder getRightEncoder() {
+    return rightEncoder;
+  }
+
   @Override
   public void periodic() {
     if (pidEnabled) {

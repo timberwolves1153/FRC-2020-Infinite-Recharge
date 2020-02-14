@@ -8,23 +8,24 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Robot;
 import frc.robot.subsystems.Drive;
 
 public class TurnForAngleCommand extends CommandBase {
   private double degreesToTurn;
   private double speedTurn;
+  private double turnSide;
   
   private Drive drive;
 
   private double startingDegrees;
 
-  public TurnForAngleCommand(double degreesToTurn, Drive drive) {
+  public TurnForAngleCommand(double degreesToTurn, double speedTurn, Drive drive) {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
     addRequirements(drive);
     this.degreesToTurn = degreesToTurn;
     this.drive = drive;
+    this.speedTurn = speedTurn;
     speedTurn = 0.6;
     startingDegrees = drive.getImuAngle();
   }
@@ -32,13 +33,13 @@ public class TurnForAngleCommand extends CommandBase {
   // Called just before this Command runs the first time
   @Override
   public void initialize() {
-    drive.arcadeDrive(0, -0.5);
+    turnSide = Math.copySign(1.0, degreesToTurn);
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   public void execute() {
-    drive.arcadeDrive(0, -0.5);
+    drive.arcadeDrive(0, turnSide * speedTurn);
   }
 
   public boolean isWithinValue() {
