@@ -56,7 +56,7 @@ public class RobotContainer {
 
     public int teleOpDriveSide;
 
-    public double lastLimelightTurnAngleDifference;
+    public double lastLimelightTurnAngleDifference = 0;
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -81,13 +81,13 @@ public class RobotContainer {
     opStart = new JoystickButton(operator, XboxController.Button.kStart.value);
     opBack = new JoystickButton(operator, XboxController.Button.kBack.value);
 
-    autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer);
+    autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
 
     teleOpDriveSide = -1;
 
     chooseAutoCommand.setDefaultOption("Auto Command Group", autoCommandGroup);
     SmartDashboard.putData("Auto Selector", chooseAutoCommand);
-    
+
     configureButtonBindings();
 
     drive.setDefaultCommand(new DefaultDrive(drive,
@@ -129,14 +129,17 @@ public class RobotContainer {
 
 //    opStart.whenPressed(new InstantCommand(climber::climb, climber));
 //    opStart.whenReleased(new InstantCommand(climber::stop, climber));
-
+    /*
     opStart.whenPressed(new InstantCommand(() -> shooter.setAcceleratorSpeed(-1), shooter));
     opStart.whenReleased(new InstantCommand(() -> shooter.setAcceleratorSpeed(0), shooter));
-    /*
-    opBack.whenPressed(new InstantCommand(climber::hookEnable, climber));
-    opBack.whenReleased(new InstantCommand(climber::hookDisable, climber));
     */
-    opBack.whenHeld(new TurnWithLimelight(drive, vision));
+    opStart.whenPressed(new InstantCommand(climber::retract, climber));
+    opStart.whenReleased(new InstantCommand(climber::stop, climber));
+
+    opBack.whenPressed(new InstantCommand(climber::climb, climber));
+    opBack.whenReleased(new InstantCommand(climber::stop, climber));
+    
+    //opBack.whenHeld(new TurnWithLimelight(drive, vision));
     
   }
 
