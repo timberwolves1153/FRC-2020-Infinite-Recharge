@@ -48,6 +48,6 @@ public class DriveForEncoder extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (drive.getLeftEncoder().getPosition() - initialEncoderCount) >= encoderTicks;
+    return (drive.getLeftEncoder().getPosition() - initialEncoderCount) <= encoderTicks;
   }
 }

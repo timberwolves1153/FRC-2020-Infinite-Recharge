@@ -10,12 +10,17 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
 public class Climber extends SubsystemBase {
   private VictorSPX winch;
   private VictorSPX hook;
+
+  private Solenoid armPistonA = new Solenoid(RobotMap.ARM_PISTON_A);
+  private Solenoid armPistonB = new Solenoid(RobotMap.ARM_PISTON_B);
+
   /**
    * Creates a new Climber.
    */
@@ -46,6 +51,16 @@ public class Climber extends SubsystemBase {
 
   public void hookRetract() {
     hook.set(ControlMode.PercentOutput, -1);
+  }
+
+  public void armUp() {
+    armPistonA.set(true);
+    armPistonB.set(true);
+  }
+
+  public void armDown() {
+    armPistonA.set(false);
+    armPistonB.set(false);
   }
 
   @Override

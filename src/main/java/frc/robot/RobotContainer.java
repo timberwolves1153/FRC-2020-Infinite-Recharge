@@ -52,6 +52,8 @@ public class RobotContainer {
     private JoystickButton opBumpRight;
     private JoystickButton opStart;
     private JoystickButton opBack;
+    private JoystickButton opLeftJoystickButton;
+    private JoystickButton opRightJoystickButton;
 
     private SendableChooser<Command> chooseAutoCommand = new SendableChooser<>();
     private AutoCommandGroup autoCommandGroup;
@@ -82,19 +84,21 @@ public class RobotContainer {
     opBumpRight = new JoystickButton(operator, XboxController.Button.kBumperRight.value);
     opStart = new JoystickButton(operator, XboxController.Button.kStart.value);
     opBack = new JoystickButton(operator, XboxController.Button.kBack.value);
+    opLeftJoystickButton = new JoystickButton(operator, XboxController.Button.kStickLeft.value);
+    opRightJoystickButton = new JoystickButton(operator, XboxController.Button.kStickRight.value);
 
     autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
 
     teleOpDriveSide = -1;
 
-    chooseAutoCommand.setDefaultOption("Drive off Auto Line", new DriveForEncoder(drive, 0.6, 1, 10));
+    chooseAutoCommand.setDefaultOption("Drive off Auto Line", new DriveForEncoder(drive, 0.6, -1, -60));
     chooseAutoCommand.addOption("Limelight Vision Command", new TurnWithLimelight(drive, vision));
     chooseAutoCommand.addOption("Auto Command Group", autoCommandGroup);
     SmartDashboard.putData("Auto Selector", chooseAutoCommand);
 
     configureButtonBindings();
 
-    LiveWindow.disableAllTelemetry();
+    //LiveWindow.disableAllTelemetry();
 
     drive.setDefaultCommand(new DefaultDrive(drive,
         () -> driver.getRawAxis(1),
@@ -113,28 +117,25 @@ public class RobotContainer {
     opBumpRight.whenPressed(new InstantCommand(indexer::dispense, indexer));
     opBumpRight.whenReleased(new InstantCommand(indexer::stop, indexer));
     
-    opX.whenPressed(new InstantCommand(indexer::startVIndexer, indexer));
-    opX.whenPressed(new InstantCommand(indexer::kick, indexer));
-    opX.whenReleased(new InstantCommand(indexer::stopVIndexer, indexer));
-    opX.whenReleased(new InstantCommand(indexer::stop, indexer));
+    opB.whenPressed(new InstantCommand(indexer::startVIndexer, indexer));
+    opB.whenPressed(new InstantCommand(indexer::kick, indexer));
+    opB.whenPressed(new InstantCommand(() -> shooter.setAcceleratorSpeed(-1), shooter));
+    opB.whenReleased(new InstantCommand(indexer::stopVIndexer, indexer));
+    opB.whenReleased(new InstantCommand(indexer::stop, indexer));
+    opB.whenReleased(new InstantCommand(() -> shooter.setAcceleratorSpeed(0), shooter));
     
     //67 auto & 87 tele
     //70 close CP
     //80 downtown
-    opY.whenPressed(new InstantCommand(() -> shooter.setSpeed(.65), shooter));
+    opY.whenPressed(new InstantCommand(() -> shooter.setSpeed(.70), shooter));
     opY.whenReleased(new InstantCommand(() -> shooter.setSpeed(0), shooter));
     
     //opY.whenPressed(shooter::pidOn, shooter);
     //opY.whenReleased(shooter::pidOff, shooter);
     
-    opA.whenPressed(new InstantCommand(indexer::outsideCollect, indexer));
-    opA.whenReleased(new InstantCommand(indexer::outsideStop, indexer));
+    opA.whenPressed(new InstantCommand(indexer::startVIndexer, indexer));
+    opA.whenReleased(new InstantCommand(indexer::stopVIndexer, indexer));
 
-    opB.whenPressed(new InstantCommand(indexer::outsideDispense, indexer));
-    opB.whenReleased(new InstantCommand(indexer::outsideStop, indexer));
-
-//    opStart.whenPressed(new InstantCommand(climber::climb, climber));
-//    opStart.whenReleased(new InstantCommand(climber::stop, climber));
     /*
     opStart.whenPressed(new InstantCommand(() -> shooter.setAcceleratorSpeed(-1), shooter));
     opStart.whenReleased(new InstantCommand(() -> shooter.setAcceleratorSpeed(0), shooter));
@@ -144,6 +145,17 @@ public class RobotContainer {
 
     opBack.whenPressed(new InstantCommand(climber::climb, climber));
     opBack.whenReleased(new InstantCommand(climber::stop, climber));
+
+    opLeftJoystickButton.whenPressed(new InstantCommand(climber::hookEnable, climber));
+    opLeftJoystickButton.whenReleased(new InstantCommand(climber::hookDisable, climber));
+
+    opX.whenPressed(new InstantCommand(climber::armUp, climber));
+    opX.whenReleased(new InstantCommand(climber::armDown, climber));
+
+    opRightJoystickButton.whenPressed(new InstantCommand(climber::hookRetract, climber));
+    opRightJoystickButton.whenReleased(new InstantCommand(climber::hookDisable, climber));
+
+
     
     //opBack.whenHeld(new TurnWithLimelight(drive, vision));
     

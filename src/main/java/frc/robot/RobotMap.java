@@ -34,6 +34,8 @@ public class RobotMap {
 	// Climber
 	public static final int WINCH = 12;
 	public static final int HOOK = 5;
+	public static final int ARM_PISTON_A = 1;
+	public static final int ARM_PISTON_B = 3;
 
 	// Color Wheel
 	public static final int COLOR_WHEEL = 9;
