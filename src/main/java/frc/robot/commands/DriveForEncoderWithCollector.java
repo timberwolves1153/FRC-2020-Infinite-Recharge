@@ -21,10 +21,10 @@ public class DriveForEncoderWithCollector extends CommandBase {
   /**
    * Creates a new DriveForEncoder.
    */
-  public DriveForEncoderWithCollector(double encoderTicks, int driveDirection, Drive drive, Indexer collector) {
+  public DriveForEncoderWithCollector(double encoderTicks, int driveDirection, Drive drive, Indexer indexer) {
     addRequirements(drive);
     this.drive = drive;
-    this.collector = collector;
+    this.collector = indexer;
     this.encoderTicks = encoderTicks;
     this.driveDirection = driveDirection;
   }

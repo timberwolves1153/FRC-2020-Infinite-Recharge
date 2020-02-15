@@ -137,7 +137,6 @@ public class LimelightVision extends PIDSubsystem {
 
 	@Override
 	protected void useOutput(double output, double setpoint) {
-		// TODO Auto-generated method stub
 
 	}
 

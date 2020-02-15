@@ -87,6 +87,7 @@ public class RobotContainer {
     teleOpDriveSide = -1;
 
     chooseAutoCommand.setDefaultOption("Auto Command Group", autoCommandGroup);
+    chooseAutoCommand.addOption("Limelight Vision Command", new TurnWithLimelight(drive, vision));
     SmartDashboard.putData("Auto Selector", chooseAutoCommand);
 
     configureButtonBindings();

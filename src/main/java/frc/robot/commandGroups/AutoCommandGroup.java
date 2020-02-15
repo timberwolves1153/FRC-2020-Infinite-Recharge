@@ -8,7 +8,6 @@
 package frc.robot.commandGroups;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.commands.DriveForEncoderWithCollector;
 import frc.robot.commands.Shoot;
@@ -40,6 +39,7 @@ public class AutoCommandGroup extends SequentialCommandGroup {
     addCommands(new TurnWithLimelight(drive, vision));
     addCommands(new Shoot(shooter));
     addCommands(new TurnForAngleCommand(-robotContainer.lastLimelightTurnAngleDifference, 0.5, drive));
+    addCommands(new DriveForEncoderWithCollector(100, 1, drive, indexer));
     addCommands(new TurnWithLimelight(drive, vision));
     addCommands(new Shoot(shooter));
   }
