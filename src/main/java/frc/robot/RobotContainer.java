@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commandGroups.AutoCommandGroup;
 import frc.robot.commands.DefaultDrive;
+import frc.robot.commands.DriveForEncoder;
 import frc.robot.commands.TurnWithLimelight;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ColorSensor;
@@ -86,8 +87,9 @@ public class RobotContainer {
 
     teleOpDriveSide = -1;
 
-    chooseAutoCommand.setDefaultOption("Auto Command Group", autoCommandGroup);
+    chooseAutoCommand.setDefaultOption("Drive off Auto Line", new DriveForEncoder(drive, 0.6, 1, 10));
     chooseAutoCommand.addOption("Limelight Vision Command", new TurnWithLimelight(drive, vision));
+    chooseAutoCommand.addOption("Auto Command Group", autoCommandGroup);
     SmartDashboard.putData("Auto Selector", chooseAutoCommand);
 
     configureButtonBindings();

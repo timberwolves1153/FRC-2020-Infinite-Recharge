@@ -39,7 +39,7 @@ public class AutoCommandGroup extends SequentialCommandGroup {
     addCommands(new TurnWithLimelight(drive, vision));
     addCommands(new Shoot(shooter));
     addCommands(new TurnForAngleCommand(-robotContainer.lastLimelightTurnAngleDifference, 0.5, drive));
-    addCommands(new DriveForEncoderWithCollector(100, 1, drive, indexer));
+    addCommands(new DriveForEncoderWithCollector(10, 1, drive, indexer));
     addCommands(new TurnWithLimelight(drive, vision));
     addCommands(new Shoot(shooter));
   }
