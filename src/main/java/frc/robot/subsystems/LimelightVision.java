@@ -1,11 +1,14 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleConsumer;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
+import frc.robot.Constants;
 
 /**
  *
@@ -17,12 +20,15 @@ public class LimelightVision extends PIDSubsystem {
 	private Target target;
 	
     public LimelightVision() {
-		super(new PIDController(0.05, 0, 0.01));
+		//super(new PIDController(0.05, 0, 0.01));
+		//super(new PIDController(0.05, 0, 0.0025));
+		super(new PIDController(0.05, 0, 0.0040));
     	table = NetworkTableInstance.getDefault().getTable("limelight");
     	
     	//horizontalAlignPid = new PIDController(0.05, 0, 0.01);
     	//horizontalAlignPid = new PIDController(0.015, 0.001, 0.01, source, output);
-    	setSetpoint(0);
+		setSetpoint(0);
+		getController().setTolerance(Constants.POSITION_TOLERANCE, Constants.VELOCITY_TOLERANCE);
 	}
 
 	public void updateLimelightData() {
@@ -135,9 +141,19 @@ public class LimelightVision extends PIDSubsystem {
 		return ((h2-h1) / (Math.tan(Math.toRadians(a1+a2))));
 	}
 
+	public void turnWithLimelight(DoubleConsumer useOutput, boolean end) {
+		setPipeline(8);
+		if(end) {
+			useOutput.accept(0);
+			setPipeline(0);
+		} else {
+			useOutput.accept(getController().calculate(getTargetX(), getController().getSetpoint()));
+		}
+	}
+
 	@Override
 	protected void useOutput(double output, double setpoint) {
-
+		
 	}
 
 	@Override

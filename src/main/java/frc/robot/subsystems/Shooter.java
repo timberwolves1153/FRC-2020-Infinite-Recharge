@@ -69,11 +69,11 @@ public class Shooter extends SubsystemBase {
     motorB.follow(motorA, true);
 
     // TODO: Clean this up: Pass in desired shooter location once and hotswap values based on controller input
-    p = SHOOTER_P[SHOOTER_POSITION_DOWNTOWN];
+    p = SHOOTER_P[SHOOTER_POSITION_CR_CLOSE];
     i = 0;
     d = 0;
-    f = SHOOTER_F[SHOOTER_POSITION_DOWNTOWN];
-    setpoint = SHOOTER_SETPOINT[SHOOTER_POSITION_DOWNTOWN];
+    f = SHOOTER_F[SHOOTER_POSITION_CR_CLOSE];
+    setpoint = SHOOTER_SETPOINT[SHOOTER_POSITION_CR_CLOSE];
 
     // Setup PID constants
     shooterPID.setP(p);

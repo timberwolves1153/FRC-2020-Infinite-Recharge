@@ -43,6 +43,20 @@ public class ColorSensor extends SubsystemBase {
     colorName = findColorName(hue);
   }
 
+  public String getColorOffset(String selectedColor) {
+    String colorOffset = "";
+    if(selectedColor.equals("Blue")) {
+      colorOffset = "Red";
+    } else if(selectedColor.equals("Yellow")) {
+      colorOffset = "Greed";
+    } else if(selectedColor.equals("Red")) {
+      colorOffset = "Blue";
+    } else if(selectedColor.equals("Green")){
+      colorOffset = "Yellow";
+    }
+    return colorOffset;
+  }
+
   public Color getColor() {
     return detectedColor;
   }

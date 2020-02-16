@@ -8,8 +8,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -54,9 +54,12 @@ public class RobotContainer {
     private JoystickButton opBack;
     private JoystickButton opLeftJoystickButton;
     private JoystickButton opRightJoystickButton;
+    private JoystickButton drStart;
 
     private SendableChooser<Command> chooseAutoCommand = new SendableChooser<>();
     private AutoCommandGroup autoCommandGroup;
+
+    private TurnWithLimelight teleOpLimelightCommand;
 
     public int teleOpDriveSide;
 
@@ -87,6 +90,8 @@ public class RobotContainer {
     opLeftJoystickButton = new JoystickButton(operator, XboxController.Button.kStickLeft.value);
     opRightJoystickButton = new JoystickButton(operator, XboxController.Button.kStickRight.value);
 
+    drStart = new JoystickButton(driver, XboxController.Button.kStart.value);
+
     autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
 
     teleOpDriveSide = -1;
@@ -99,6 +104,8 @@ public class RobotContainer {
     configureButtonBindings();
 
     //LiveWindow.disableAllTelemetry();
+
+    teleOpLimelightCommand = new TurnWithLimelight(drive, vision);
 
     drive.setDefaultCommand(new DefaultDrive(drive,
         () -> driver.getRawAxis(1),
@@ -144,16 +151,37 @@ public class RobotContainer {
     opBack.whenPressed(new InstantCommand(climber::climb, climber));
     opBack.whenReleased(new InstantCommand(climber::stop, climber));
 
-    opLeftJoystickButton.whenPressed(new InstantCommand(climber::hookEnable, climber));
-    opLeftJoystickButton.whenReleased(new InstantCommand(climber::hookDisable, climber));
-
     opX.whenPressed(new InstantCommand(climber::armUp, climber));
     opX.whenReleased(new InstantCommand(climber::armDown, climber));
+
+    opLeftJoystickButton.whenPressed(new InstantCommand(climber::hookEnable, climber));
+    opLeftJoystickButton.whenReleased(new InstantCommand(climber::hookDisable, climber));
 
     opRightJoystickButton.whenPressed(new InstantCommand(climber::hookRetract, climber));
     opRightJoystickButton.whenReleased(new InstantCommand(climber::hookDisable, climber));
 
+    drStart.whileHeld(() -> {
+      if(drive.getDefaultCommand().isScheduled()){
+        drive.getDefaultCommand().cancel();
+      }
+      vision.turnWithLimelight(output -> {
+        if(output < 0.25) {
+          drive.arcadeDrive(0, output * 1.5);
+          System.out.println(output * 1.5);
+        } else {
+          drive.arcadeDrive(0, output);
+          System.out.println(output);
+        }
+        //drive.arcadeDrive(0, output);
+        System.out.println(output);
+      }, false);
+      //vision.turnWithLimelight(output -> System.out.println(output), false);
+    });
+    drStart.whenReleased(() -> {
+      vision.turnWithLimelight(output -> drive.arcadeDrive(0, output), true);
+      drive.getDefaultCommand().schedule();
 
+    });
     
     //opBack.whenHeld(new TurnWithLimelight(drive, vision));
     

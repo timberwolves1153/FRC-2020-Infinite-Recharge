@@ -21,4 +21,8 @@ public class Constants {
     public static final double greenHueMax = 140.0;
     public static final double blueHueMin = 175.0;
     public static final double blueHueMax = 195.0;
+
+    //Limelight Constants 
+    public static final double POSITION_TOLERANCE = 5;
+    public static final double VELOCITY_TOLERANCE = 5;
 }
