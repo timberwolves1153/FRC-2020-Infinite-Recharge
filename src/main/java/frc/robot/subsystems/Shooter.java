@@ -30,6 +30,16 @@ public class Shooter extends SubsystemBase {
 
   private boolean pidEnabled = false;
 
+  // Common shooting positions
+  @SuppressWarnings("unused") private static final int SHOOTER_POSITION_AUTO = 0;
+  @SuppressWarnings("unused") private static final int SHOOTER_POSITION_CR_CLOSE = 1;
+  @SuppressWarnings("unused") private static final int SHOOTER_POSITION_DOWNTOWN = 2;
+
+  // Tuned shooter PID values for common shooting positions
+  private static final double[] SHOOTER_P = {.0005, .0005, .0005};
+  private static final double[] SHOOTER_F = {(.67/3400), (.75/3900), (.82/4500)};
+  private static final double[] SHOOTER_SETPOINT = {3400, 4100, 4500};
+
   private double p, i, d, f, setpoint;
 
   private static final double MAX_OUTPUT = 1;
@@ -58,13 +68,19 @@ public class Shooter extends SubsystemBase {
 
     motorB.follow(motorA, true);
 
-    p = 0.05;
+    // TODO: Clean this up: Pass in desired shooter location once and hotswap values based on controller input
+    p = SHOOTER_P[SHOOTER_POSITION_DOWNTOWN];
     i = 0;
     d = 0;
-    f = 0.00018510638;
-    setpoint = 0;
+    f = SHOOTER_F[SHOOTER_POSITION_DOWNTOWN];
+    setpoint = SHOOTER_SETPOINT[SHOOTER_POSITION_DOWNTOWN];
 
-    setupPIDConstants(shooterPID, p, i, d, f);
+    // Setup PID constants
+    shooterPID.setP(p);
+    shooterPID.setI(i);
+    shooterPID.setD(d);
+    shooterPID.setFF(f);
+    shooterPID.setOutputRange(MIN_OUTPUT, MAX_OUTPUT);
 
     SmartDashboard.putNumber("Shooter P Gain", p);
     SmartDashboard.putNumber("Shooter I Gain", i);
@@ -86,6 +102,8 @@ public class Shooter extends SubsystemBase {
     double d = SmartDashboard.getNumber("Shooter D Gain", 0);
     double f = SmartDashboard.getNumber("Shooter F Gain", 0);
 
+    // If PID constants have changed due to input on ShuffleBoard, inform the PID controller
+    // of the changes
     if ((p != this.p)) {
       shooterPID.setP(p);
       this.p = p;
@@ -104,14 +122,6 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  private void setupPIDConstants(CANPIDController a, double p, double i, double d, double f) {
-    a.setP(p);
-    a.setI(i);
-    a.setD(d);
-    a.setFF(f);
-    a.setOutputRange(MIN_OUTPUT, MAX_OUTPUT);
-  }
-
   public void pidOn() {
     if (!pidEnabled) {
       pidEnabled = true;
@@ -125,9 +135,8 @@ public class Shooter extends SubsystemBase {
   }
 
   private void pidPeriodic() {
-    //setpoint = SmartDashboard.getNumber("Shooter Setpoint", 0);
-    shooterPID.setReference(4700, ControlType.kVelocity);
-    System.out.println("Setting setpoint");
+    setpoint = SmartDashboard.getNumber("Shooter Setpoint", 0);
+    shooterPID.setReference(setpoint, ControlType.kVelocity);
   }
 
   public void setSpeed(double speed) {
