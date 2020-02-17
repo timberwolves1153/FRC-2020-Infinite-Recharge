@@ -8,7 +8,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -59,8 +58,6 @@ public class RobotContainer {
     private SendableChooser<Command> chooseAutoCommand = new SendableChooser<>();
     private AutoCommandGroup autoCommandGroup;
 
-    private TurnWithLimelight teleOpLimelightCommand;
-
     public int teleOpDriveSide;
 
     public double lastLimelightTurnAngleDifference = 0;
@@ -104,8 +101,6 @@ public class RobotContainer {
     configureButtonBindings();
 
     //LiveWindow.disableAllTelemetry();
-
-    teleOpLimelightCommand = new TurnWithLimelight(drive, vision);
 
     drive.setDefaultCommand(new DefaultDrive(drive,
         () -> driver.getRawAxis(1),
