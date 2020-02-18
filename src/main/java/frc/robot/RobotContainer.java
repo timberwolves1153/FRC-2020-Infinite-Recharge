@@ -89,7 +89,7 @@ public class RobotContainer {
     opRightJoystickButton = new JoystickButton(operator, XboxController.Button.kStickRight.value);
 
     drStart = new JoystickButton(driver, XboxController.Button.kStart.value);
-    drX = new JoystickButton(driver, XboxController.Button.kStart.value);
+    drX = new JoystickButton(driver, XboxController.Button.kX.value);
 
     autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
 
@@ -104,9 +104,9 @@ public class RobotContainer {
 
     //LiveWindow.disableAllTelemetry();
 
-    /*drive.setDefaultCommand(new DefaultDrive(drive,
+    drive.setDefaultCommand(new DefaultDrive(drive,
         () -> driver.getRawAxis(1),
-        () -> driver.getRawAxis(4)));*/
+        () -> driver.getRawAxis(4)));
   }
 
   /**

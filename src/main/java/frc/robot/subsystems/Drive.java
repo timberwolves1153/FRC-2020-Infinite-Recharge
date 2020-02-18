@@ -86,10 +86,10 @@ public class Drive extends SubsystemBase {
     rightFollowerA.setIdleMode(IdleMode.kBrake);
 
     // Velocity Regulation PID constants
-    p = 0.0934;
+    p = 0.0427;
     i = 0;
     d = 0;
-    setpoint = 0;
+    setpoint = 24;
 
     setupPIDConstants(leftPID, p, i, d);
     setupPIDConstants(rightPID, p, i, d);
@@ -98,7 +98,11 @@ public class Drive extends SubsystemBase {
     rightEncoder.setVelocityConversionFactor(0.0315561762079);
 
     // Trapezoidal Motion Profiling Parameters
-    /*setupProfilingParameters(leftPID, maxVelocity, minOutputVelocity, maxAccel);
+    /*maxVelocity = 24;
+    minOutputVelocity = 0;
+    maxAccel = 6;
+
+    setupProfilingParameters(leftPID, maxVelocity, minOutputVelocity, maxAccel);
     setupProfilingParameters(rightPID, maxVelocity, minOutputVelocity, maxAccel);*/
 
     SmartDashboard.putNumber("P Gain", p);
@@ -209,7 +213,7 @@ public class Drive extends SubsystemBase {
   private void pidPeriodic() {
     setpoint = SmartDashboard.getNumber("Setpoint", 0);
     leftPID.setReference(setpoint, ControlType.kVelocity);
-    rightPID.setReference(setpoint, ControlType.kVelocity);
+    rightPID.setReference(-setpoint, ControlType.kVelocity);
   }
 
   public void setMotorIdleMode(IdleMode mode) {
