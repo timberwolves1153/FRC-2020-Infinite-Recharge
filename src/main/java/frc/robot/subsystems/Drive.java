@@ -86,13 +86,16 @@ public class Drive extends SubsystemBase {
     rightFollowerA.setIdleMode(IdleMode.kBrake);
 
     // Velocity Regulation PID constants
-    p = 0.0000036902;
-    i = 0.0001314766;
+    p = 0.0934;
+    i = 0;
     d = 0;
     setpoint = 0;
 
     setupPIDConstants(leftPID, p, i, d);
     setupPIDConstants(rightPID, p, i, d);
+
+    leftEncoder.setVelocityConversionFactor(0.0315561762079);
+    rightEncoder.setVelocityConversionFactor(0.0315561762079);
 
     // Trapezoidal Motion Profiling Parameters
     /*setupProfilingParameters(leftPID, maxVelocity, minOutputVelocity, maxAccel);
@@ -180,6 +183,7 @@ public class Drive extends SubsystemBase {
   }
 
   public void pidOn() {
+    System.out.println("PID On");
     if (!pidEnabled) {
       pidEnabled = true;
       leftPID.setIAccum(0);
@@ -188,6 +192,7 @@ public class Drive extends SubsystemBase {
   }
 
   public void pidOff() {
+    System.out.println("PID Off");
     pidEnabled = false;
   }
 

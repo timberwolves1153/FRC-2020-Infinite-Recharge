@@ -24,7 +24,27 @@ public class ColorSensor extends SubsystemBase {
   private double proximity;
   private double hue;
 
+  private Colors red;
+  private Colors yellow;
+  private Colors blue;
+  private Colors green;
+  private Colors emptyColor;
+
   public String colorName;
+
+  private enum Colors {
+    RED("Red"), YELLOW("Yellow"), BLUE("Blue"), GREEN("Green"), NONE("None");
+
+    private final String color;
+
+    Colors(String color) {
+      this.color = color;
+    }
+
+    public String getColorName() {
+      return color;
+    }
+  }
 
   /**
    * Creates a new ColorSensor.
@@ -32,6 +52,11 @@ public class ColorSensor extends SubsystemBase {
   public ColorSensor() {
     i2cPort = I2C.Port.kOnboard;
     colorSensor = new ColorSensorV3(i2cPort);
+    red = Colors.RED;
+    yellow = Colors.YELLOW;
+    blue = Colors.BLUE;
+    green = Colors.GREEN;
+    emptyColor = Colors.NONE;
     updateColorData();
   }
 
@@ -40,19 +65,19 @@ public class ColorSensor extends SubsystemBase {
     IR = colorSensor.getIR();
     proximity = colorSensor.getProximity();
     hue = RGBtoHue(detectedColor.red, detectedColor.green, detectedColor.blue);
-    colorName = findColorName(hue);
+    colorName = findColorName(hue).getColorName();
   }
 
-  public String getColorOffset(String selectedColor) {
-    String colorOffset = "";
-    if(selectedColor.equals("Blue")) {
-      colorOffset = "Red";
-    } else if(selectedColor.equals("Yellow")) {
-      colorOffset = "Greed";
-    } else if(selectedColor.equals("Red")) {
-      colorOffset = "Blue";
-    } else if(selectedColor.equals("Green")){
-      colorOffset = "Yellow";
+  public Colors getColorOffset(Colors selectedColor) {
+    Colors colorOffset = emptyColor;
+    if(selectedColor.equals(blue)) {
+      colorOffset = red;
+    } else if(selectedColor.equals(yellow)) {
+      colorOffset = green;
+    } else if(selectedColor.equals(red)) {
+      colorOffset = blue;
+    } else if(selectedColor.equals(green)){
+      colorOffset = yellow;
     }
     return colorOffset;
   }
@@ -99,18 +124,16 @@ public class ColorSensor extends SubsystemBase {
     return hue;
   }
 
-  public String findColorName(double hue){
-    String color = "";
+  public Colors findColorName(double hue){
+    Colors color = emptyColor;
     if(hue >= Constants.yellowHueMin && hue <= Constants.yellowHueMax) {
-      color = "Yellow";
+      color = yellow;
     } else if(hue >= Constants.greenHueMin && hue <= Constants.greenHueMax) {
-      color = "Green";
+      color = green;
     } else if(hue >= Constants.redHueMin && hue <= Constants.redHueMax) {
-      color = "Red";
+      color = red;
     } else if(hue >= Constants.blueHueMin && hue <= Constants.blueHueMax) {
-      color = "Blue";
-    } else {
-      color = "";
+      color = blue;
     }
     return color;
   }

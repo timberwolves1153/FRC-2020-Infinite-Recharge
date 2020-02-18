@@ -54,6 +54,7 @@ public class RobotContainer {
     private JoystickButton opLeftJoystickButton;
     private JoystickButton opRightJoystickButton;
     private JoystickButton drStart;
+    private JoystickButton drX;
 
     private SendableChooser<Command> chooseAutoCommand = new SendableChooser<>();
     private AutoCommandGroup autoCommandGroup;
@@ -88,12 +89,13 @@ public class RobotContainer {
     opRightJoystickButton = new JoystickButton(operator, XboxController.Button.kStickRight.value);
 
     drStart = new JoystickButton(driver, XboxController.Button.kStart.value);
+    drX = new JoystickButton(driver, XboxController.Button.kStart.value);
 
     autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
 
     teleOpDriveSide = -1;
 
-    chooseAutoCommand.setDefaultOption("Drive off Auto Line", new DriveForEncoder(drive, 0.6, -1, -60));
+    chooseAutoCommand.setDefaultOption("Drive off Auto Line", new DriveForEncoder(drive, 0.6, -1, 60));
     chooseAutoCommand.addOption("Limelight Vision Command", new TurnWithLimelight(drive, vision));
     chooseAutoCommand.addOption("Auto Command Group", autoCommandGroup);
     SmartDashboard.putData("Auto Selector", chooseAutoCommand);
@@ -102,9 +104,9 @@ public class RobotContainer {
 
     //LiveWindow.disableAllTelemetry();
 
-    drive.setDefaultCommand(new DefaultDrive(drive,
+    /*drive.setDefaultCommand(new DefaultDrive(drive,
         () -> driver.getRawAxis(1),
-        () -> driver.getRawAxis(4)));
+        () -> driver.getRawAxis(4)));*/
   }
 
   /**
@@ -175,8 +177,10 @@ public class RobotContainer {
     drStart.whenReleased(() -> {
       vision.turnWithLimelight(output -> drive.arcadeDrive(0, output), true);
       drive.getDefaultCommand().schedule();
-
     });
+
+    drX.whenPressed(new InstantCommand(drive::pidOn, drive));
+    drX.whenReleased(new InstantCommand(drive::pidOff, drive));
     
     //opBack.whenHeld(new TurnWithLimelight(drive, vision));
     

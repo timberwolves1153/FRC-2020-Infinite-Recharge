@@ -23,7 +23,7 @@ public class DriveForEncoder extends CommandBase {
     addRequirements(drive);
     this.drive = drive;
     this.power = power;
-    this.encoderTicks = encoderTicks;
+    this.encoderTicks = encoderTicks * driveDirection;
     this.driveDirection = driveDirection;
   }
 
@@ -48,6 +48,10 @@ public class DriveForEncoder extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (drive.getLeftEncoder().getPosition() - initialEncoderCount) <= encoderTicks;
+    if(encoderTicks < 0) {
+      return (drive.getLeftEncoder().getPosition() - initialEncoderCount) <= encoderTicks;
+    } else {
+      return (drive.getLeftEncoder().getPosition() - initialEncoderCount) >= encoderTicks;
+    }
   }
 }
