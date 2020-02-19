@@ -86,10 +86,17 @@ public class Drive extends SubsystemBase {
     rightFollowerA.setIdleMode(IdleMode.kBrake);
 
     // Velocity Regulation PID constants
-    p = 0.0427;
+    //More or less stable
+    //p = 0.01425
+    //d = 0.000112
+    //Slightly less stable
+    //p = 0.01625
+    //d = 0.000175
+    //setpoint = 56;
+    p = 0.02;
     i = 0;
     d = 0;
-    setpoint = 24;
+    setpoint = 36;
 
     setupPIDConstants(leftPID, p, i, d);
     setupPIDConstants(rightPID, p, i, d);
@@ -230,6 +237,10 @@ public class Drive extends SubsystemBase {
 
   public CANEncoder getRightEncoder() {
     return rightEncoder;
+  }
+
+  public boolean getPIDEnabled() {
+    return pidEnabled;
   }
 
   @Override

@@ -179,8 +179,29 @@ public class RobotContainer {
       drive.getDefaultCommand().schedule();
     });
 
-    drX.whenPressed(new InstantCommand(drive::pidOn, drive));
-    drX.whenReleased(new InstantCommand(drive::pidOff, drive));
+    drX.whileHeld(new InstantCommand(() -> {
+      if(drive.getDefaultCommand().isScheduled()) {
+        drive.getDefaultCommand().cancel();
+      }
+      if(!drive.getPIDEnabled()) {
+        drive.pidOn();
+      }
+    }, drive));
+    drX.whenReleased(new InstantCommand(() -> {
+      drive.pidOff();
+      drive.getDefaultCommand().schedule();
+    }, drive));
+
+    /*drX.whenPressed(() -> {
+      if(drive.getDefaultCommand().isScheduled()) {
+        drive.getDefaultCommand().cancel();
+      }
+      drive.pidOn();
+    }, drive);
+    drX.whenReleased(() -> {
+      drive.pidOff();
+      drive.getDefaultCommand().schedule();
+    }, drive);*/
     
     //opBack.whenHeld(new TurnWithLimelight(drive, vision));
     
