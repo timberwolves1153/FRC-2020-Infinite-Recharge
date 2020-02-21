@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
 public class Climber extends SubsystemBase {
-  private VictorSPX winch;
-  private VictorSPX hook;
+  private VictorSPX winchA;
+  private VictorSPX winchB;
 
   private Solenoid armPistonA = new Solenoid(RobotMap.ARM_PISTON_A);
   private Solenoid armPistonB = new Solenoid(RobotMap.ARM_PISTON_B);
@@ -25,32 +25,25 @@ public class Climber extends SubsystemBase {
    * Creates a new Climber.
    */
   public Climber() {
-    winch = new VictorSPX(RobotMap.WINCH);
-    hook = new VictorSPX(RobotMap.HOOK);
+    winchA = new VictorSPX(RobotMap.WINCH_A);
+    winchB = new VictorSPX(RobotMap.WINCH_B);
+    configureMaster();
+  }
+
+  private void configureMaster() {
+    winchB.follow(winchA);
   }
 
   public void climb() {
-    winch.set(ControlMode.PercentOutput, 1);
+    winchA.set(ControlMode.PercentOutput, 1);
   }
 
   public void retract() {
-    winch.set(ControlMode.PercentOutput, -1);
+    winchA.set(ControlMode.PercentOutput, -1);
   }
 
   public void stop() {
-    winch.set(ControlMode.PercentOutput, 0);
-  }
-
-  public void hookEnable() {
-    hook.set(ControlMode.PercentOutput, 1);
-  }
-  
-  public void hookDisable() {
-    hook.set(ControlMode.PercentOutput, 0);
-  }
-
-  public void hookRetract() {
-    hook.set(ControlMode.PercentOutput, -1);
+    winchA.set(ControlMode.PercentOutput, 0);
   }
 
   public void armUp() {

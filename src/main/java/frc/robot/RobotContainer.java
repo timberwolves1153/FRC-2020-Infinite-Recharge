@@ -12,12 +12,14 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commandGroups.AutoCommandGroup;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DefaultShooter;
 import frc.robot.commands.DriveForEncoder;
+import frc.robot.commands.RunDrivePID;
 import frc.robot.commands.TurnWithLimelight;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ColorSensor;
@@ -52,13 +54,13 @@ public class RobotContainer {
     private JoystickButton opBumpRight;
     private JoystickButton opStart;
     private JoystickButton opBack;
-    private JoystickButton opLeftJoystickButton;
-    private JoystickButton opRightJoystickButton;
     private JoystickButton drStart;
     private JoystickButton drX;
 
     private SendableChooser<Command> chooseAutoCommand = new SendableChooser<>();
     private AutoCommandGroup autoCommandGroup;
+
+    private RunDrivePID runDrivePID;
 
     public int teleOpDriveSide;
 
@@ -86,13 +88,12 @@ public class RobotContainer {
     opBumpRight = new JoystickButton(operator, XboxController.Button.kBumperRight.value);
     opStart = new JoystickButton(operator, XboxController.Button.kStart.value);
     opBack = new JoystickButton(operator, XboxController.Button.kBack.value);
-    opLeftJoystickButton = new JoystickButton(operator, XboxController.Button.kStickLeft.value);
-    opRightJoystickButton = new JoystickButton(operator, XboxController.Button.kStickRight.value);
 
     drStart = new JoystickButton(driver, XboxController.Button.kStart.value);
     drX = new JoystickButton(driver, XboxController.Button.kX.value);
 
     autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
+    runDrivePID = new RunDrivePID(drive);
 
     teleOpDriveSide = -1;
 
@@ -153,12 +154,6 @@ public class RobotContainer {
     opX.whenPressed(new InstantCommand(climber::armUp, climber));
     opX.whenReleased(new InstantCommand(climber::armDown, climber));
 
-    opLeftJoystickButton.whenPressed(new InstantCommand(climber::hookEnable, climber));
-    opLeftJoystickButton.whenReleased(new InstantCommand(climber::hookDisable, climber));
-
-    opRightJoystickButton.whenPressed(new InstantCommand(climber::hookRetract, climber));
-    opRightJoystickButton.whenReleased(new InstantCommand(climber::hookDisable, climber));
-
     drStart.whileHeld(() -> {
       if(drive.getDefaultCommand().isScheduled()){
         drive.getDefaultCommand().cancel();
@@ -181,29 +176,8 @@ public class RobotContainer {
       drive.getDefaultCommand().schedule();
     });
 
-    drX.whileHeld(new InstantCommand(() -> {
-      if(drive.getDefaultCommand().isScheduled()) {
-        drive.getDefaultCommand().cancel();
-      }
-      if(!drive.getPIDEnabled()) {
-        drive.pidOn();
-      }
-    }, drive));
-    drX.whenReleased(new InstantCommand(() -> {
-      drive.pidOff();
-      drive.getDefaultCommand().schedule();
-    }, drive));
-
-    /*drX.whenPressed(() -> {
-      if(drive.getDefaultCommand().isScheduled()) {
-        drive.getDefaultCommand().cancel();
-      }
-      drive.pidOn();
-    }, drive);
-    drX.whenReleased(() -> {
-      drive.pidOff();
-      drive.getDefaultCommand().schedule();
-    }, drive);*/
+    drX.whenPressed(runDrivePID);
+    drX.whenReleased(() -> CommandScheduler.getInstance().cancel(runDrivePID));
     
     //opBack.whenHeld(new TurnWithLimelight(drive, vision));
     
@@ -213,7 +187,7 @@ public class RobotContainer {
     drive.updateDashboard();
     //colorSensor.updateDashboard();
     indexer.updateDashboard();
-    shooter.updateDashboard();
+    //shooter.updateDashboard();
   }
 
   public XboxController getDriveStick() {

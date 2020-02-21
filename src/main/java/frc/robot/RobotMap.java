@@ -32,8 +32,8 @@ public class RobotMap {
 	public static final int V_INDEX_MOTOR_B = 10;
 
 	// Climber
-	public static final int WINCH = 12;
-	public static final int HOOK = 5;
+	public static final int WINCH_A = 12;
+	public static final int WINCH_B = 3;
 	public static final int ARM_PISTON_A = 1;
 	public static final int ARM_PISTON_B = 3;
 

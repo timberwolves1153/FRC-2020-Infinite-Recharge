@@ -34,9 +34,8 @@ public class TurnWithLimelight extends PIDCommand {
         // This should return the setpoint (can also be a constant)
         0,
         // This uses the output
-        //output -> drive.arcadeDrive(0, output * 0.25), 
-        output -> System.out.println(output),
-        drive);
+        output -> drive.arcadeDrive(0, output), 
+        drive, vision);
     // Use addRequirements() here to declare subsystem dependencies.
     // Configure additional PID options by calling `getController` here.
     getController().setTolerance(5, 5);
