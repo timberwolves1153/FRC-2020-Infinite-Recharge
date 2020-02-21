@@ -22,7 +22,7 @@ public class Shooter extends SubsystemBase {
   
   private CANSparkMax motorA;
   private CANSparkMax motorB;
-  private CANSparkMax accelerator;
+  private CANSparkMax feeder;
 
   private CANEncoder shooterEncoder;
 
@@ -48,7 +48,7 @@ public class Shooter extends SubsystemBase {
   public Shooter() {
     motorA = new CANSparkMax(RobotMap.SHOOTER_MOTOR_A, CANSparkMax.MotorType.kBrushless);
     motorB = new CANSparkMax(RobotMap.SHOOTER_MOTOR_B, CANSparkMax.MotorType.kBrushless);
-    accelerator = new CANSparkMax(RobotMap.ACCELERATOR, CANSparkMax.MotorType.kBrushless);
+    feeder = new CANSparkMax(RobotMap.FEEDER, CANSparkMax.MotorType.kBrushless);
 
     shooterEncoder = motorA.getEncoder();
 
@@ -60,11 +60,11 @@ public class Shooter extends SubsystemBase {
   private void configSparkParams() {
     motorA.restoreFactoryDefaults();
     motorB.restoreFactoryDefaults();
-    accelerator.restoreFactoryDefaults();
+    feeder.restoreFactoryDefaults();
 
     motorA.setIdleMode(IdleMode.kCoast);
     motorB.setIdleMode(IdleMode.kCoast);
-    accelerator.setIdleMode(IdleMode.kCoast);
+    feeder.setIdleMode(IdleMode.kCoast);
 
     motorB.follow(motorA, true);
 
@@ -90,7 +90,7 @@ public class Shooter extends SubsystemBase {
 
     motorA.burnFlash();
     motorB.burnFlash();
-    accelerator.burnFlash();
+    feeder.burnFlash();
   }
 
   public void updateDashboard() {
@@ -141,16 +141,16 @@ public class Shooter extends SubsystemBase {
 
   public void setSpeed(double speed) {
     motorA.set(speed);
-   // accelerator.set(0.5);
+   // feeder.set(0.5);
   }
 
   public void stop(){
     motorA.set(0);
-    accelerator.set(0);
+    feeder.set(0);
   }
 
-  public void setAcceleratorSpeed(double speed) {
-    accelerator.set(speed);
+  public void setFeederSpeed(double speed) {
+    feeder.set(speed);
   }
 
   @Override

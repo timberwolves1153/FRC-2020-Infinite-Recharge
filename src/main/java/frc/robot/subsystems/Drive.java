@@ -38,7 +38,7 @@ public class Drive extends SubsystemBase {
   private CANPIDController leftPID;
   private CANPIDController rightPID;
 
-  public double p, i, d, setpoint;
+  public double p, i, d, f, setpoint;
   private static final double MAX_OUTPUT = 1;
   private static final double MIN_OUTPUT = -1;
 
@@ -93,13 +93,20 @@ public class Drive extends SubsystemBase {
     //p = 0.01625
     //d = 0.000175
     //setpoint = 56;
-    p = 0.02;
+    //Tuned
+    //p = 0.000001;
+    //d = 0.000005;
+    //f = 0.006;
+
+    //Tuned PID Values
+    p = 0.000001;
     i = 0;
-    d = 0;
+    d = 0.000005;
+    f = 0.006;
     setpoint = 36;
 
-    setupPIDConstants(leftPID, p, i, d);
-    setupPIDConstants(rightPID, p, i, d);
+    setupPIDConstants(leftPID, p, i, d, f);
+    setupPIDConstants(rightPID, p, i, d, f);
 
     leftEncoder.setVelocityConversionFactor(0.0315561762079);
     rightEncoder.setVelocityConversionFactor(0.0315561762079);
@@ -115,6 +122,7 @@ public class Drive extends SubsystemBase {
     SmartDashboard.putNumber("P Gain", p);
     SmartDashboard.putNumber("I Gain", i);
     SmartDashboard.putNumber("D Gain", d);
+    SmartDashboard.putNumber("F Gain", f);
     SmartDashboard.putNumber("Max Velocity", maxVelocity);
     SmartDashboard.putNumber("Min Output Velocity", minOutputVelocity);
     SmartDashboard.putNumber("Max Accel", maxAccel);
@@ -127,10 +135,11 @@ public class Drive extends SubsystemBase {
     rightFollowerA.burnFlash();
   }
 
-  private void setupPIDConstants(CANPIDController a, double p, double i, double d) {
+  private void setupPIDConstants(CANPIDController a, double p, double i, double d, double f) {
     a.setP(p);
     a.setI(i);
     a.setD(d);
+    a.setFF(f);
     a.setOutputRange(MIN_OUTPUT, MAX_OUTPUT);
   }
 
@@ -156,6 +165,7 @@ public class Drive extends SubsystemBase {
     double p = SmartDashboard.getNumber("P Gain", 0);
     double i = SmartDashboard.getNumber("I Gain", 0);
     double d = SmartDashboard.getNumber("D Gain", 0);
+    double f = SmartDashboard.getNumber("F Gain", 0);
     /*double maxVelocity = SmartDashboard.getNumber("Max Velocity", 0);
     double minOutputVelocity = SmartDashboard.getNumber("Min Output Velocity", 0);
     double maxAccel = SmartDashboard.getNumber("Max Accel", 0);*/
@@ -174,6 +184,11 @@ public class Drive extends SubsystemBase {
       leftPID.setD(d);
       rightPID.setD(d);
       this.d = d;
+    }
+    if((f != this.f)) {
+      leftPID.setFF(f);
+      rightPID.setFF(f);
+      this.f = f;
     }
 
     /*if ((maxVelocity != this.maxVelocity)) {

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commandGroups.AutoCommandGroup;
 import frc.robot.commands.DefaultDrive;
+import frc.robot.commands.DefaultShooter;
 import frc.robot.commands.DriveForEncoder;
 import frc.robot.commands.TurnWithLimelight;
 import frc.robot.subsystems.Climber;
@@ -107,6 +108,8 @@ public class RobotContainer {
     drive.setDefaultCommand(new DefaultDrive(drive,
         () -> driver.getRawAxis(1),
         () -> driver.getRawAxis(4)));
+    
+    //shooter.setDefaultCommand(new DefaultShooter(shooter, () -> operator.getRawAxis(2)));
   }
 
   /**
@@ -123,10 +126,10 @@ public class RobotContainer {
     
     opB.whenPressed(new InstantCommand(indexer::startVIndexer, indexer));
     opB.whenPressed(new InstantCommand(indexer::kick, indexer));
-    opB.whenPressed(new InstantCommand(() -> shooter.setAcceleratorSpeed(-1), shooter));
+    opB.whenPressed(new InstantCommand(() -> shooter.setFeederSpeed(-1), shooter));
     opB.whenReleased(new InstantCommand(indexer::stopVIndexer, indexer));
     opB.whenReleased(new InstantCommand(indexer::stop, indexer));
-    opB.whenReleased(new InstantCommand(() -> shooter.setAcceleratorSpeed(0), shooter));
+    opB.whenReleased(new InstantCommand(() -> shooter.setFeederSpeed(0), shooter));
     
     // Auto: 0.67, Close CP: 0.74, Downtown: 0.82
     /*opY.whenPressed(new InstantCommand(() -> shooter.setSpeed(.82), shooter));
@@ -138,12 +141,11 @@ public class RobotContainer {
     opA.whenPressed(new InstantCommand(indexer::startVIndexer, indexer));
     opA.whenReleased(new InstantCommand(indexer::stopVIndexer, indexer));
 
-    /*
-    opStart.whenPressed(new InstantCommand(() -> shooter.setAcceleratorSpeed(-1), shooter));
-    opStart.whenReleased(new InstantCommand(() -> shooter.setAcceleratorSpeed(0), shooter));
-    */
-    opStart.whenPressed(new InstantCommand(climber::retract, climber));
-    opStart.whenReleased(new InstantCommand(climber::stop, climber));
+    opStart.whenPressed(new InstantCommand(() -> shooter.setFeederSpeed(-1), shooter));
+    opStart.whenReleased(new InstantCommand(() -> shooter.setFeederSpeed(0), shooter));
+    
+    //opStart.whenPressed(new InstantCommand(climber::retract, climber));
+    //opStart.whenReleased(new InstantCommand(climber::stop, climber));
 
     opBack.whenPressed(new InstantCommand(climber::climb, climber));
     opBack.whenReleased(new InstantCommand(climber::stop, climber));
