@@ -32,6 +32,7 @@ public class Climber extends SubsystemBase {
 
   private void configureMaster() {
     winchB.follow(winchA);
+    winchB.setInverted(true);
   }
 
   public void climb() {
@@ -44,6 +45,10 @@ public class Climber extends SubsystemBase {
 
   public void stop() {
     winchA.set(ControlMode.PercentOutput, 0);
+  }
+
+  public void setPower(double power) {
+    winchA.set(ControlMode.PercentOutput, power);
   }
 
   public void armUp() {

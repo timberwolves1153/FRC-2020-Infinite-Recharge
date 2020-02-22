@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commandGroups.AutoCommandGroup;
+import frc.robot.commands.DefaultClimb;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DefaultShooter;
 import frc.robot.commands.DriveForEncoder;
@@ -61,6 +62,7 @@ public class RobotContainer {
     private AutoCommandGroup autoCommandGroup;
 
     private RunDrivePID runDrivePID;
+    private TurnWithLimelight turnWithLimelight;
 
     public int teleOpDriveSide;
 
@@ -94,6 +96,7 @@ public class RobotContainer {
 
     autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
     runDrivePID = new RunDrivePID(drive);
+    turnWithLimelight = new TurnWithLimelight(drive, vision);
 
     teleOpDriveSide = -1;
 
@@ -109,7 +112,7 @@ public class RobotContainer {
     drive.setDefaultCommand(new DefaultDrive(drive,
         () -> driver.getRawAxis(1),
         () -> driver.getRawAxis(4)));
-    
+    climber.setDefaultCommand(new DefaultClimb(climber, () -> -operator.getRawAxis(1)));
     //shooter.setDefaultCommand(new DefaultShooter(shooter, () -> operator.getRawAxis(2)));
   }
 
@@ -154,7 +157,10 @@ public class RobotContainer {
     opX.whenPressed(new InstantCommand(climber::armUp, climber));
     opX.whenReleased(new InstantCommand(climber::armDown, climber));
 
-    drStart.whileHeld(() -> {
+    drStart.whenPressed(turnWithLimelight);
+    drStart.whenReleased(() -> CommandScheduler.getInstance().cancel(turnWithLimelight));
+
+    /*drStart.whileHeld(() -> {
       if(drive.getDefaultCommand().isScheduled()){
         drive.getDefaultCommand().cancel();
       }
@@ -174,7 +180,7 @@ public class RobotContainer {
     drStart.whenReleased(() -> {
       vision.turnWithLimelight(output -> drive.arcadeDrive(0, output), true);
       drive.getDefaultCommand().schedule();
-    });
+    });*/
 
     drX.whenPressed(runDrivePID);
     drX.whenReleased(() -> CommandScheduler.getInstance().cancel(runDrivePID));

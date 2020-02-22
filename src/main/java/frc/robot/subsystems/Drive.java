@@ -12,6 +12,7 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import com.revrobotics.CANPIDController.AccelStrategy;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -44,8 +45,8 @@ public class Drive extends SubsystemBase {
 
   private static final ADIS16470_IMU imu = new ADIS16470_IMU();
 
-  //private static final int SMART_MOTION_SLOT = 0;
-  public double maxVelocity, minOutputVelocity, maxAccel;
+  private static final int SMART_MOTION_SLOT = 0;
+  public double maxVelocity, minOutputVelocity, maxAccel, allowedErr;
 
   private DifferentialDrive differentialDrive;
 
@@ -112,12 +113,12 @@ public class Drive extends SubsystemBase {
     rightEncoder.setVelocityConversionFactor(0.0315561762079);
 
     // Trapezoidal Motion Profiling Parameters
-    /*maxVelocity = 24;
+    maxVelocity = 24;
     minOutputVelocity = 0;
     maxAccel = 6;
 
-    setupProfilingParameters(leftPID, maxVelocity, minOutputVelocity, maxAccel);
-    setupProfilingParameters(rightPID, maxVelocity, minOutputVelocity, maxAccel);*/
+    setupProfilingParameters(leftPID, maxVelocity, minOutputVelocity, maxAccel, allowedErr);
+    setupProfilingParameters(rightPID, maxVelocity, minOutputVelocity, maxAccel, allowedErr);
 
     SmartDashboard.putNumber("P Gain", p);
     SmartDashboard.putNumber("I Gain", i);
@@ -126,6 +127,7 @@ public class Drive extends SubsystemBase {
     SmartDashboard.putNumber("Max Velocity", maxVelocity);
     SmartDashboard.putNumber("Min Output Velocity", minOutputVelocity);
     SmartDashboard.putNumber("Max Accel", maxAccel);
+    SmartDashboard.putNumber("Allowed Error", allowedErr);
     SmartDashboard.putNumber("Setpoint", setpoint);
 
     //Save Config Settings
@@ -143,12 +145,13 @@ public class Drive extends SubsystemBase {
     a.setOutputRange(MIN_OUTPUT, MAX_OUTPUT);
   }
 
-  /*private void setupProfilingParameters(CANPIDController a, double maxVelocity, double minOutputVelocity, double maxAccel) {
+  private void setupProfilingParameters(CANPIDController a, double maxVelocity, double minOutputVelocity, double maxAccel, double allowedErr) {
     a.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, SMART_MOTION_SLOT);
     a.setSmartMotionMaxVelocity(maxVelocity, SMART_MOTION_SLOT);
     a.setSmartMotionMinOutputVelocity(minOutputVelocity, SMART_MOTION_SLOT);
     a.setSmartMotionMaxAccel(maxAccel, SMART_MOTION_SLOT);
-  }*/
+    a.setSmartMotionAllowedClosedLoopError(allowedErr, SMART_MOTION_SLOT);
+  }
 
   public void arcadeDrive(double power, double turn) {
     differentialDrive.arcadeDrive(power, turn);
@@ -166,9 +169,10 @@ public class Drive extends SubsystemBase {
     double i = SmartDashboard.getNumber("I Gain", 0);
     double d = SmartDashboard.getNumber("D Gain", 0);
     double f = SmartDashboard.getNumber("F Gain", 0);
-    /*double maxVelocity = SmartDashboard.getNumber("Max Velocity", 0);
+    double maxVelocity = SmartDashboard.getNumber("Max Velocity", 0);
     double minOutputVelocity = SmartDashboard.getNumber("Min Output Velocity", 0);
-    double maxAccel = SmartDashboard.getNumber("Max Accel", 0);*/
+    double maxAccel = SmartDashboard.getNumber("Max Accel", 0);
+    double allowedErr = SmartDashboard.getNumber("Allowed Error", 0);
 
     if ((p != this.p)) {
       leftPID.setP(p);
@@ -191,7 +195,7 @@ public class Drive extends SubsystemBase {
       this.f = f;
     }
 
-    /*if ((maxVelocity != this.maxVelocity)) {
+    if ((maxVelocity != this.maxVelocity)) {
       leftPID.setSmartMotionMaxVelocity(maxVelocity, SMART_MOTION_SLOT);
       rightPID.setSmartMotionMaxVelocity(maxVelocity, SMART_MOTION_SLOT);
       this.maxVelocity = maxVelocity;
@@ -205,7 +209,12 @@ public class Drive extends SubsystemBase {
       leftPID.setSmartMotionMaxAccel(maxAccel, SMART_MOTION_SLOT);
       rightPID.setSmartMotionMaxAccel(maxAccel, SMART_MOTION_SLOT);
       this.maxAccel = maxAccel;
-    }*/
+    }
+    if(allowedErr != this.allowedErr) {
+      leftPID.setSmartMotionAllowedClosedLoopError(allowedErr, SMART_MOTION_SLOT);
+      leftPID.setSmartMotionAllowedClosedLoopError(allowedErr, SMART_MOTION_SLOT);
+      this.allowedErr = allowedErr;
+    }
   }
 
   public void pidOn() {
@@ -234,8 +243,8 @@ public class Drive extends SubsystemBase {
 
   private void pidPeriodic() {
     setpoint = SmartDashboard.getNumber("Setpoint", 0);
-    leftPID.setReference(setpoint, ControlType.kVelocity);
-    rightPID.setReference(-setpoint, ControlType.kVelocity);
+    leftPID.setReference(setpoint, ControlType.kSmartVelocity, 0);
+    rightPID.setReference(-setpoint, ControlType.kSmartVelocity, 0);
   }
 
   public void setMotorIdleMode(IdleMode mode) {
