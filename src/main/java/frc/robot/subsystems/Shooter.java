@@ -19,6 +19,52 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
 public class Shooter extends SubsystemBase {
+  public enum ShooterPosition {
+    AUTO_LINE(0), CR_CLOSE(1), DOWNTOWN(2), INVALID(3);
+
+    private int value;
+    
+    private ShooterPosition(int value) {
+      this.value = value;
+    }
+
+    public int getPosition() {
+      return value;
+    }
+
+    public static ShooterPosition fromInt(int value) {
+      for(ShooterPosition position : values()) {
+        if(position.value == value) {
+          return position;
+        }
+      }
+      return INVALID;
+    }
+
+    public static int getHighestValue() {
+      int highestVal = 0;
+      for(ShooterPosition position : values()) {
+        if(position.value > highestVal) {
+          highestVal = position.value;
+        }
+      }
+      return highestVal - 1;
+    }
+  }
+
+  public enum Direction {
+    kForwards(1), kBackwards(-1);
+
+    private int direction;
+
+    private Direction(int direction) {
+      this.direction = direction;
+    }
+
+    public int getDirection() {
+      return direction;
+    }
+  }
   
   private CANSparkMax motorA;
   private CANSparkMax motorB;
@@ -41,6 +87,8 @@ public class Shooter extends SubsystemBase {
   private static final double[] SHOOTER_SETPOINT = {3400, 4100, 4500};
 
   private double p, i, d, f, setpoint;
+
+  private ShooterPosition defaultPosition = ShooterPosition.CR_CLOSE;
 
   private static final double MAX_OUTPUT = 1;
   private static final double MIN_OUTPUT = -1;
@@ -68,12 +116,11 @@ public class Shooter extends SubsystemBase {
 
     motorB.follow(motorA, true);
 
-    // TODO: Clean this up: Pass in desired shooter location once and hotswap values based on controller input
-    p = SHOOTER_P[SHOOTER_POSITION_CR_CLOSE];
+    p = SHOOTER_P[defaultPosition.getPosition()];
     i = 0;
     d = 0;
-    f = SHOOTER_F[SHOOTER_POSITION_CR_CLOSE];
-    setpoint = SHOOTER_SETPOINT[SHOOTER_POSITION_CR_CLOSE];
+    f = SHOOTER_F[defaultPosition.getPosition()];
+    setpoint = SHOOTER_SETPOINT[defaultPosition.getPosition()];
 
     // Setup PID constants
     shooterPID.setP(p);
@@ -96,30 +143,12 @@ public class Shooter extends SubsystemBase {
   public void updateDashboard() {
     SmartDashboard.putNumber("Shooter Velocity", shooterEncoder.getVelocity());
     SmartDashboard.putNumber("Shooter Power", motorA.get());
+    SmartDashboard.putNumber("Shooter Position", defaultPosition.getPosition());
+  }
 
-    double p = SmartDashboard.getNumber("Shooter P Gain", 0);
-    double i = SmartDashboard.getNumber("Shooter I Gain", 0);
-    double d = SmartDashboard.getNumber("Shooter D Gain", 0);
-    double f = SmartDashboard.getNumber("Shooter F Gain", 0);
-
-    // If PID constants have changed due to input on ShuffleBoard, inform the PID controller
-    // of the changes
-    if ((p != this.p)) {
-      shooterPID.setP(p);
-      this.p = p;
-    }
-    if ((i != this.i)) {
-      shooterPID.setI(i);
-      this.i = i;
-    }
-    if ((d != this.d)) {
-      shooterPID.setD(d);
-      this.d = d;
-    }
-    if((f != this.f)) {
-      shooterPID.setFF(f);
-      this.f = f;
-    }
+  public void updateGains(double p, double f) {
+    shooterPID.setP(p);
+    shooterPID.setFF(f);
   }
 
   public void pidOn() {
@@ -151,6 +180,39 @@ public class Shooter extends SubsystemBase {
 
   public void setFeederSpeed(double speed) {
     feeder.set(speed);
+  }
+
+  public void setGainPreset(ShooterPosition shooterPosition) {
+    p = SHOOTER_P[shooterPosition.getPosition()];
+    f = SHOOTER_F[shooterPosition.getPosition()];
+    setpoint = SHOOTER_SETPOINT[shooterPosition.getPosition()];
+    SmartDashboard.putNumber("Shooter P Gain", p);
+    SmartDashboard.putNumber("Shooter F Gain", f);
+    SmartDashboard.putNumber("Shooter Setpoint", setpoint);
+    updateGains(p, f);
+  }
+
+  public void resetGainPreset() {
+    p = SHOOTER_P[defaultPosition.getPosition()];
+    f = SHOOTER_F[defaultPosition.getPosition()];
+    setpoint = SHOOTER_SETPOINT[defaultPosition.getPosition()];
+    SmartDashboard.putNumber("Shooter P Gain", p);
+    SmartDashboard.putNumber("Shooter F Gain", f);
+    SmartDashboard.putNumber("Shooter Setpoint", setpoint);
+    updateGains(p, f);
+  }
+
+  public void cycleGainPreset(Direction direction) {
+    int highestVal = ShooterPosition.getHighestValue();
+    int nextPosition = defaultPosition.getPosition() + direction.getDirection();
+    if(nextPosition < 0) {
+      defaultPosition = ShooterPosition.fromInt(highestVal);
+    } else if(nextPosition > highestVal) {
+      defaultPosition = ShooterPosition.fromInt(0);
+    } else {
+      defaultPosition = ShooterPosition.fromInt(nextPosition);
+    }
+    setGainPreset(defaultPosition);
   }
 
   @Override

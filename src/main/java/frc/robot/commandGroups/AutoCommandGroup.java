@@ -17,6 +17,7 @@ import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.ShooterPosition;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -37,10 +38,10 @@ public class AutoCommandGroup extends SequentialCommandGroup {
     new Shoot(shooter));
     */
     addCommands(new TurnWithLimelight(drive, vision));
-    addCommands(new Shoot(shooter));
+    addCommands(new Shoot(shooter, ShooterPosition.AUTO_LINE));
     addCommands(new TurnForAngleCommand(-robotContainer.lastLimelightTurnAngleDifference, 0.5, drive));
     addCommands(new DriveForEncoderWithCollector(10, 1, drive, indexer));
     addCommands(new TurnWithLimelight(drive, vision));
-    addCommands(new Shoot(shooter));
+    addCommands(new Shoot(shooter, ShooterPosition.CR_CLOSE));
   }
 }

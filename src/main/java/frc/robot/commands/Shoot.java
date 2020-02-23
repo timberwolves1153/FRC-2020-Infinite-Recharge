@@ -9,22 +9,26 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.ShooterPosition;
 
 public class Shoot extends CommandBase {
   private Shooter shooter;
+  private ShooterPosition shooterPosition;
   private long startTime;
   /**
    * Creates a new Shoot.
    */
-  public Shoot(Shooter shooter) {
+  public Shoot(Shooter shooter, ShooterPosition shooterPosition) {
     addRequirements(shooter);
     this.shooter = shooter;
+    this.shooterPosition = shooterPosition;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    shooter.setGainPreset(shooterPosition);
     shooter.pidOn();
     startTime = System.currentTimeMillis();
   }
@@ -38,6 +42,7 @@ public class Shoot extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     shooter.pidOff();
+    shooter.resetGainPreset();
     shooter.setSpeed(0);
   }
 

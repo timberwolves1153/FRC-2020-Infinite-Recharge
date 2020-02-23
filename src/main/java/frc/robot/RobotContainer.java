@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+//import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commandGroups.AutoCommandGroup;
 import frc.robot.commands.DefaultClimb;
 import frc.robot.commands.DefaultDrive;
@@ -28,6 +29,7 @@ import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.Direction;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -55,6 +57,11 @@ public class RobotContainer {
     private JoystickButton opBumpRight;
     private JoystickButton opStart;
     private JoystickButton opBack;
+    private JoystickButton opLeftJoystickButton;
+    private JoystickButton opRightJoystickButton;
+    //private POVButton opPOVUp;
+    //private POVButton opPOVDown;
+
     private JoystickButton drStart;
     private JoystickButton drX;
 
@@ -90,6 +97,10 @@ public class RobotContainer {
     opBumpRight = new JoystickButton(operator, XboxController.Button.kBumperRight.value);
     opStart = new JoystickButton(operator, XboxController.Button.kStart.value);
     opBack = new JoystickButton(operator, XboxController.Button.kBack.value);
+    opLeftJoystickButton = new JoystickButton(operator, XboxController.Button.kStickLeft.value);
+    opRightJoystickButton = new JoystickButton(operator, XboxController.Button.kStickRight.value);
+    //opPOVUp = new POVButton(operator, 0);
+    //opPOVDown = new POVButton(operator, 0);
 
     drStart = new JoystickButton(driver, XboxController.Button.kStart.value);
     drX = new JoystickButton(driver, XboxController.Button.kX.value);
@@ -112,7 +123,7 @@ public class RobotContainer {
     drive.setDefaultCommand(new DefaultDrive(drive,
         () -> driver.getRawAxis(1),
         () -> driver.getRawAxis(4)));
-    climber.setDefaultCommand(new DefaultClimb(climber, () -> -operator.getRawAxis(1)));
+    climber.setDefaultCommand(new DefaultClimb(climber, () -> operator.getRawAxis(1)));
     //shooter.setDefaultCommand(new DefaultShooter(shooter, () -> operator.getRawAxis(2)));
   }
 
@@ -157,6 +168,9 @@ public class RobotContainer {
     opX.whenPressed(new InstantCommand(climber::armUp, climber));
     opX.whenReleased(new InstantCommand(climber::armDown, climber));
 
+    opLeftJoystickButton.whenPressed(() -> shooter.cycleGainPreset(Direction.kForwards), shooter);
+    opRightJoystickButton.whenPressed(() -> shooter.cycleGainPreset(Direction.kBackwards), shooter);
+
     drStart.whenPressed(turnWithLimelight);
     drStart.whenReleased(() -> CommandScheduler.getInstance().cancel(turnWithLimelight));
 
@@ -193,7 +207,7 @@ public class RobotContainer {
     drive.updateDashboard();
     //colorSensor.updateDashboard();
     indexer.updateDashboard();
-    //shooter.updateDashboard();
+    shooter.updateDashboard();
   }
 
   public XboxController getDriveStick() {
