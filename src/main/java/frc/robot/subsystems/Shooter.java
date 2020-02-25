@@ -91,6 +91,7 @@ public class Shooter extends SubsystemBase {
   private double p, i, d, f, setpoint;
 
   private ShooterPosition defaultPosition = ShooterPosition.CR_CLOSE;
+  private ShooterPosition selectedPosition;
 
   private static final double MAX_OUTPUT = 1;
   private static final double MIN_OUTPUT = -1;
@@ -231,6 +232,7 @@ public class Shooter extends SubsystemBase {
    */
   public void setGainPreset(ShooterPosition shooterPosition) {
     int pos = shooterPosition.getPosition();
+    selectedPosition = shooterPosition;
 
     // I and D values are not pulled from an array since these values are always zero
     setPIDGains(SHOOTER_P[pos], 0, 0, SHOOTER_F[pos], SHOOTER_SETPOINT[pos]);
@@ -254,6 +256,18 @@ public class Shooter extends SubsystemBase {
       defaultPosition = ShooterPosition.fromInt(nextPosition);
     }
     setGainPreset(defaultPosition);
+  }
+
+  public double getShooterVelocity() {
+    return shooterEncoder.getVelocity();
+  }
+
+  public double getSetpoint() {
+    return SHOOTER_SETPOINT[selectedPosition.getPosition()];
+  }
+
+  public ShooterPosition getSelectedPosition() {
+    return selectedPosition;
   }
 
   @Override
