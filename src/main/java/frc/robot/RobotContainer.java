@@ -123,8 +123,6 @@ public class RobotContainer {
     drive.setDefaultCommand(new DefaultDrive(drive,
         () -> driver.getRawAxis(1),
         () -> driver.getRawAxis(4)));
-    climber.setDefaultCommand(new DefaultClimb(climber, () -> operator.getRawAxis(1)));
-    //shooter.setDefaultCommand(new DefaultShooter(shooter, () -> operator.getRawAxis(2)));
   }
 
   /**
@@ -159,8 +157,8 @@ public class RobotContainer {
     opStart.whenPressed(new InstantCommand(() -> shooter.setFeederSpeed(-1), shooter));
     opStart.whenReleased(new InstantCommand(() -> shooter.setFeederSpeed(0), shooter));
     
-    //opStart.whenPressed(new InstantCommand(climber::retract, climber));
-    //opStart.whenReleased(new InstantCommand(climber::stop, climber));
+    opStart.whenPressed(new InstantCommand(climber::retract, climber));
+    opStart.whenReleased(new InstantCommand(climber::stop, climber));
 
     opBack.whenPressed(new InstantCommand(climber::climb, climber));
     opBack.whenReleased(new InstantCommand(climber::stop, climber));
