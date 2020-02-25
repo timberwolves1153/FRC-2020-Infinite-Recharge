@@ -76,10 +76,12 @@ public class Shooter extends SubsystemBase {
 
   private boolean pidEnabled = false;
 
-  // Common shooting positions
-  @SuppressWarnings("unused") private static final int SHOOTER_POSITION_AUTO = 0;
-  @SuppressWarnings("unused") private static final int SHOOTER_POSITION_CR_CLOSE = 1;
-  @SuppressWarnings("unused") private static final int SHOOTER_POSITION_DOWNTOWN = 2;
+  /**
+   * Outputs and reads extra telemetry from Shuffleboard for effortless testing;
+   * this option should be set to `false` during competitions as important values
+   * are then read from defaults set in code
+   */
+  private static final boolean TEST = false;
 
   // Tuned shooter PID values for common shooting positions
   private static final double[] SHOOTER_P = {.0005, .0005, .0005};
@@ -105,6 +107,13 @@ public class Shooter extends SubsystemBase {
     configSparkParams();
   }
 
+  /**
+   * Sets all config parameters for motor controllers
+   * 
+   * Motor controller parameters are set in code and then saved to the controller
+   * flash by design so that if a motor controller misses initial configuration,
+   * it will default to the last-saved values
+   */
   private void configSparkParams() {
     motorA.restoreFactoryDefaults();
     motorB.restoreFactoryDefaults();
@@ -116,41 +125,68 @@ public class Shooter extends SubsystemBase {
 
     motorB.follow(motorA, true);
 
-    p = SHOOTER_P[defaultPosition.getPosition()];
-    i = 0;
-    d = 0;
-    f = SHOOTER_F[defaultPosition.getPosition()];
-    setpoint = SHOOTER_SETPOINT[defaultPosition.getPosition()];
-
-    // Setup PID constants
-    shooterPID.setP(p);
-    shooterPID.setI(i);
-    shooterPID.setD(d);
-    shooterPID.setFF(f);
+    resetGainPreset();
     shooterPID.setOutputRange(MIN_OUTPUT, MAX_OUTPUT);
-
-    SmartDashboard.putNumber("Shooter P Gain", p);
-    SmartDashboard.putNumber("Shooter I Gain", i);
-    SmartDashboard.putNumber("Shooter D Gain", d);
-    SmartDashboard.putNumber("Shooter F Gain", f);
-    SmartDashboard.putNumber("Shooter Setpoint", setpoint);
 
     motorA.burnFlash();
     motorB.burnFlash();
     feeder.burnFlash();
   }
 
+  /**
+   * Handles all Shooter-related SmartDashboard read/write updates
+   */
   public void updateDashboard() {
-    SmartDashboard.putNumber("Shooter Velocity", shooterEncoder.getVelocity());
-    SmartDashboard.putNumber("Shooter Power", motorA.get());
-    SmartDashboard.putNumber("Shooter Position", defaultPosition.getPosition());
+    if (TEST) {
+      SmartDashboard.putNumber("Shooter Velocity", shooterEncoder.getVelocity());
+      SmartDashboard.putNumber("Shooter Power", motorA.get());
+      SmartDashboard.putNumber("Shooter Position", defaultPosition.getPosition());
+
+      double p = SmartDashboard.getNumber("Shooter P", this.p);
+      double i = SmartDashboard.getNumber("Shooter I", this.i);
+      double d = SmartDashboard.getNumber("Shooter D", this.d);
+      double f = SmartDashboard.getNumber("Shooter F", this.f);
+      double setpoint = SmartDashboard.getNumber("Shooter Setpoint", this.setpoint);
+
+      // If there are any changes from Shuffleboard, update the PID Controller
+      if (this.p != p || this.i != i || this.d != d || this.f != f || this.setpoint != setpoint) {
+        setPIDGains(p, i, d, f, setpoint);
+      }
+    }
   }
 
-  public void updateGains(double p, double f) {
+  /**
+   * Sets all tuning parameters for the rotation-regulating PID
+   * @param p P gain
+   * @param i I gain
+   * @param d D gain
+   * @param f Feed-forward gain
+   * @param setpoint RPM setpoint
+   */
+  public void setPIDGains(double p, double i, double d, double f, double setpoint) {
+    this.p = p;
+    this.i = i;
+    this.d = d;
+    this.f = f;
+    this.setpoint = setpoint;
+
     shooterPID.setP(p);
+    shooterPID.setI(i);
+    shooterPID.setD(d);
     shooterPID.setFF(f);
+
+    if (TEST) {
+      SmartDashboard.putNumber("Shooter P Gain", p);
+      SmartDashboard.putNumber("Shooter I Gain", i);
+      SmartDashboard.putNumber("Shooter D Gain", d);
+      SmartDashboard.putNumber("Shooter F Gain", f);
+      SmartDashboard.putNumber("Shooter Setpoint", setpoint);
+    }
   }
 
+  /**
+   * Sets a flag that will signal the PID to run periodically
+   */
   public void pidOn() {
     if (!pidEnabled) {
       pidEnabled = true;
@@ -158,13 +194,19 @@ public class Shooter extends SubsystemBase {
     }
   }
 
+  /**
+   * Sets a flag that will prevent the PID from running periodically
+   */
   public void pidOff() {
     pidEnabled = false;
     motorA.set(0);
   }
 
+  /**
+   * Runs all periodic logic for the PID controller, called periodically while
+   * the PID is enabled
+   */
   private void pidPeriodic() {
-    setpoint = SmartDashboard.getNumber("Shooter Setpoint", 0);
     shooterPID.setReference(setpoint, ControlType.kVelocity);
   }
 
@@ -182,24 +224,23 @@ public class Shooter extends SubsystemBase {
     feeder.set(speed);
   }
 
+  /**
+   * Convenience wrapper that sets PID parameters according to pre-stored values that
+   * correspond with the given shooter position
+   * @param shooterPosition Indicates the shooter position for which PID values will be updated
+   */
   public void setGainPreset(ShooterPosition shooterPosition) {
-    p = SHOOTER_P[shooterPosition.getPosition()];
-    f = SHOOTER_F[shooterPosition.getPosition()];
-    setpoint = SHOOTER_SETPOINT[shooterPosition.getPosition()];
-    SmartDashboard.putNumber("Shooter P Gain", p);
-    SmartDashboard.putNumber("Shooter F Gain", f);
-    SmartDashboard.putNumber("Shooter Setpoint", setpoint);
-    updateGains(p, f);
+    int pos = shooterPosition.getPosition();
+
+    // I and D values are not pulled from an array since these values are always zero
+    setPIDGains(SHOOTER_P[pos], 0, 0, SHOOTER_F[pos], SHOOTER_SETPOINT[pos]);
   }
 
+  /**
+   * Convenience method that sets PID parameters according to pre-stored default values
+   */
   public void resetGainPreset() {
-    p = SHOOTER_P[defaultPosition.getPosition()];
-    f = SHOOTER_F[defaultPosition.getPosition()];
-    setpoint = SHOOTER_SETPOINT[defaultPosition.getPosition()];
-    SmartDashboard.putNumber("Shooter P Gain", p);
-    SmartDashboard.putNumber("Shooter F Gain", f);
-    SmartDashboard.putNumber("Shooter Setpoint", setpoint);
-    updateGains(p, f);
+    setGainPreset(defaultPosition);
   }
 
   public void cycleGainPreset(Direction direction) {

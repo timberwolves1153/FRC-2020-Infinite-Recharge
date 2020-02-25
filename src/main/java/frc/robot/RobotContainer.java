@@ -153,9 +153,6 @@ public class RobotContainer {
     
     opA.whenPressed(new InstantCommand(indexer::startVIndexer, indexer));
     opA.whenReleased(new InstantCommand(indexer::stopVIndexer, indexer));
-
-    opStart.whenPressed(new InstantCommand(() -> shooter.setFeederSpeed(-1), shooter));
-    opStart.whenReleased(new InstantCommand(() -> shooter.setFeederSpeed(0), shooter));
     
     opStart.whenPressed(new InstantCommand(climber::retract, climber));
     opStart.whenReleased(new InstantCommand(climber::stop, climber));
