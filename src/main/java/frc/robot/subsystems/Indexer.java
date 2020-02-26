@@ -51,6 +51,7 @@ public class Indexer extends SubsystemBase {
 
   private void configMaster() {
     vIndexB.follow(vIndexA);
+    vIndexB.setInverted(true);
   }
 
   public void startVIndexer() {
@@ -65,10 +66,12 @@ public class Indexer extends SubsystemBase {
 
   public void collect() {
     insideCollectRoller.set(ControlMode.PercentOutput, -1);
+    outsideCollectRoller.set(ControlMode.PercentOutput, 1);
   }
 
   public void dispense() {
     insideCollectRoller.set(ControlMode.PercentOutput, 1);
+    outsideCollectRoller.set(ControlMode.PercentOutput, -1);
   }
 
   public void kick() {
@@ -77,17 +80,6 @@ public class Indexer extends SubsystemBase {
 
   public void stop() {
     insideCollectRoller.set(ControlMode.PercentOutput, 0);
-  }
-
-  public void outsideCollect() {
-    outsideCollectRoller.set(ControlMode.PercentOutput, 1);
-  }
-
-  public void outsideDispense() {
-    outsideCollectRoller.set(ControlMode.PercentOutput, -1);
-  }
-
-  public void outsideStop() {
     outsideCollectRoller.set(ControlMode.PercentOutput, 0);
   }
 }
