@@ -150,8 +150,11 @@ public class RobotContainer {
     /*opY.whenPressed(new InstantCommand(() -> shooter.setSpeed(.82), shooter));
     opY.whenReleased(new InstantCommand(() -> shooter.setSpeed(0), shooter));*/
     
-    opY.whenPressed(shoot);
-    opY.whenReleased(() -> CommandScheduler.getInstance().cancel(shoot));
+    //opY.whenPressed(shoot);
+    //opY.whenReleased(() -> CommandScheduler.getInstance().cancel(shoot));
+
+    opY.whenPressed(new InstantCommand(shooter::pidOn, shooter));
+    opY.whenReleased(new InstantCommand(shooter::pidOff, shooter));
     
     opA.whenPressed(new InstantCommand(indexer::startVIndexer, indexer));
     opA.whenReleased(new InstantCommand(indexer::stopVIndexer, indexer));

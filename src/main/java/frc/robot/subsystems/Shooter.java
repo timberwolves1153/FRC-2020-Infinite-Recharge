@@ -81,12 +81,13 @@ public class Shooter extends SubsystemBase {
    * this option should be set to `false` during competitions as important values
    * are then read from defaults set in code
    */
-  private static final boolean TEST = false;
+  private static final boolean TEST = true;
 
   // Tuned shooter PID values for common shooting positions
   private static final double[] SHOOTER_P = {.0005, .0005, .0005};
   private static final double[] SHOOTER_F = {(.67/3400), (.75/3900), (.82/4500)};
-  private static final double[] SHOOTER_SETPOINT = {3400, 4100, 4500};
+  private static final double[] SHOOTER_SETPOINT = {3400, 3700, 4500};
+  //Setpoint Values: 3400, 4100, 4500
 
   private double p, i, d, f, setpoint;
 
