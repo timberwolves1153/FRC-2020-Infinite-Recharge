@@ -22,6 +22,7 @@ import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DefaultShooter;
 import frc.robot.commands.DriveForEncoder;
 import frc.robot.commands.RunDrivePID;
+import frc.robot.commands.Shoot;
 import frc.robot.commands.TurnWithLimelight;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ColorSensor;
@@ -70,6 +71,7 @@ public class RobotContainer {
 
     private RunDrivePID runDrivePID;
     private TurnWithLimelight turnWithLimelight;
+    private Shoot shoot;
 
     public int teleOpDriveSide;
 
@@ -108,7 +110,7 @@ public class RobotContainer {
     autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
     runDrivePID = new RunDrivePID(drive);
     turnWithLimelight = new TurnWithLimelight(drive, vision);
-
+    shoot = new Shoot(shooter, vision, false);
     teleOpDriveSide = -1;
 
     chooseAutoCommand.setDefaultOption("Drive off Auto Line", new DriveForEncoder(drive, 0.6, -1, 60));
@@ -148,8 +150,8 @@ public class RobotContainer {
     /*opY.whenPressed(new InstantCommand(() -> shooter.setSpeed(.82), shooter));
     opY.whenReleased(new InstantCommand(() -> shooter.setSpeed(0), shooter));*/
     
-    opY.whenPressed(shooter::pidOn, shooter);
-    opY.whenReleased(shooter::pidOff, shooter);
+    opY.whenPressed(shoot);
+    opY.whenReleased(() -> CommandScheduler.getInstance().cancel(shoot));
     
     opA.whenPressed(new InstantCommand(indexer::startVIndexer, indexer));
     opA.whenReleased(new InstantCommand(indexer::stopVIndexer, indexer));

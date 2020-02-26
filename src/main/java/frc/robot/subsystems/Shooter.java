@@ -262,8 +262,12 @@ public class Shooter extends SubsystemBase {
     return shooterEncoder.getVelocity();
   }
 
-  public double getSetpoint() {
+  public double getSetPoint() {
     return SHOOTER_SETPOINT[selectedPosition.getPosition()];
+  }
+
+  public boolean isAtSetpoint() {
+    return shooterEncoder.getVelocity() >= getSetPoint(); 
   }
 
   public ShooterPosition getSelectedPosition() {

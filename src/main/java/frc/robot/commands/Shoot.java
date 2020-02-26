@@ -8,21 +8,30 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
+import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterPosition;
 
 public class Shoot extends CommandBase {
   private Shooter shooter;
+  private LimelightVision vision;
+
   private ShooterPosition shooterPosition;
   private long startTime;
+  private boolean isAuto;
   /**
    * Creates a new Shoot.
    */
-  public Shoot(Shooter shooter, ShooterPosition shooterPosition) {
+  public Shoot(Shooter shooter, LimelightVision vision, ShooterPosition shooterPosition, boolean isAuto) {
     addRequirements(shooter);
     this.shooter = shooter;
+    this.vision = vision;
     this.shooterPosition = shooterPosition;
-    // Use addRequirements() here to declare subsystem dependencies.
+    this.isAuto = isAuto;
+  }
+  public Shoot(Shooter shooter, LimelightVision vision, boolean isAuto) {
+    this(shooter, vision, shooter.getSelectedPosition(), isAuto);
   }
 
   // Called when the command is initially scheduled.
@@ -36,6 +45,23 @@ public class Shoot extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    /*ShooterPosition shooterPosition = this.shooterPosition;
+    if(vision.isAreaWithin(Constants.AUTO_LINE_MIN_AREA, Constants.AUTO_LINE_MAX_AREA)) {
+      shooterPosition = ShooterPosition.AUTO_LINE;
+    } else if (vision.isAreaWithin(Constants.CR_CLOSE_MIN_AREA, Constants.CR_CLOSE_MAX_AREA)) {
+      shooterPosition = ShooterPosition.CR_CLOSE;
+    } else if (vision.isAreaWithin(Constants.DOWNTOWN_MIN_AREA, Constants.DOWNTOWN_MAX_AREA)) {
+      shooterPosition = ShooterPosition.DOWNTOWN;
+    }
+    if(shooterPosition != this.shooterPosition) {
+      shooter.setGainPreset(shooterPosition);
+      this.shooterPosition = shooterPosition;
+    }*/
+    if(shooter.isAtSetpoint()) {
+      shooter.setFeederSpeed(1);
+    } else {
+      shooter.setFeederSpeed(0);
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -44,11 +70,16 @@ public class Shoot extends CommandBase {
     shooter.pidOff();
     shooter.resetGainPreset();
     shooter.setSpeed(0);
+    shooter.setFeederSpeed(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (System.currentTimeMillis() - startTime) > 3;
+    if(isAuto) {
+      return (System.currentTimeMillis() - startTime) > 3;
+    } else {
+      return false;
+    }
   }
 }
