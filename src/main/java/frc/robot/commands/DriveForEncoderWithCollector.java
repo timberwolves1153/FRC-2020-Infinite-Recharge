@@ -40,7 +40,6 @@ public class DriveForEncoderWithCollector extends CommandBase {
   public void execute() {
     drive.arcadeDrive(driveDirection * 0.8, 0);
     collector.collect();
-    collector.outsideCollect();
   }
 
   // Called once the command ends or is interrupted.
@@ -48,7 +47,6 @@ public class DriveForEncoderWithCollector extends CommandBase {
   public void end(boolean interrupted) {
     drive.arcadeDrive(0, 0);
     collector.stop();
-    collector.outsideStop();
   }
 
   // Returns true when the command should end.
