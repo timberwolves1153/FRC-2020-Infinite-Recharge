@@ -25,4 +25,10 @@ public class Constants {
     //Limelight Constants 
     public static final double POSITION_TOLERANCE = 5;
     public static final double VELOCITY_TOLERANCE = 5;
+    public static final double AUTO_LINE_MAX_AREA = 0;
+    public static final double AUTO_LINE_MIN_AREA = 0;
+    public static final double CR_CLOSE_MAX_AREA = 0;
+    public static final double CR_CLOSE_MIN_AREA = 0;
+    public static final double DOWNTOWN_MAX_AREA = 0;
+    public static final double DOWNTOWN_MIN_AREA = 0;
 }

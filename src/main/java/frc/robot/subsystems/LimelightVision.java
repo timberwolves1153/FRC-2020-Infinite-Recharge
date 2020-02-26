@@ -151,6 +151,10 @@ public class LimelightVision extends PIDSubsystem {
 		}
 	}
 
+	public boolean isAreaWithin(double minVal, double maxVal) {
+		return (getTargetArea() <= maxVal && getTargetArea() >= minVal);
+	  }
+
 	@Override
 	protected void useOutput(double output, double setpoint) {
 		
