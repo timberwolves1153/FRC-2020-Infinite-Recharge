@@ -36,11 +36,11 @@ public class Climber extends SubsystemBase {
   }
 
   public void climb() {
-    winchA.set(ControlMode.PercentOutput, 1);
+    winchA.set(ControlMode.PercentOutput, -.5);
   }
 
   public void retract() {
-    winchA.set(ControlMode.PercentOutput, -1);
+    winchA.set(ControlMode.PercentOutput, .5);
   }
 
   public void stop() {
