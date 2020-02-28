@@ -165,8 +165,8 @@ public class RobotContainer {
     opBack.whenPressed(new InstantCommand(climber::climb, climber));
     opBack.whenReleased(new InstantCommand(climber::stop, climber));
 
-    opX.whenPressed(new InstantCommand(climber::armUp, climber));
-    opX.whenReleased(new InstantCommand(climber::armDown, climber));
+    opX.whenPressed(new InstantCommand(climber::toggle, climber));
+    //opX.whenReleased(new InstantCommand(climber::armDown, climber));
 
     opLeftJoystickButton.whenPressed(() -> shooter.cycleGainPreset(Direction.kForwards), shooter);
     opRightJoystickButton.whenPressed(() -> shooter.cycleGainPreset(Direction.kBackwards), shooter);

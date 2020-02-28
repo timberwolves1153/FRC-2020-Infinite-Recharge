@@ -27,6 +27,7 @@ public class Climber extends SubsystemBase {
   public Climber() {
     winchA = new VictorSPX(RobotMap.WINCH_A);
     winchB = new VictorSPX(RobotMap.WINCH_B);
+    armDown();
     configureMaster();
   }
 
@@ -36,11 +37,11 @@ public class Climber extends SubsystemBase {
   }
 
   public void climb() {
-    winchA.set(ControlMode.PercentOutput, -.5);
+    winchA.set(ControlMode.PercentOutput, -1);
   }
 
   public void retract() {
-    winchA.set(ControlMode.PercentOutput, .5);
+    winchA.set(ControlMode.PercentOutput, 1);
   }
 
   public void stop() {
@@ -53,12 +54,20 @@ public class Climber extends SubsystemBase {
 
   public void armUp() {
     armPistonA.set(true);
-    armPistonB.set(true);
+    armPistonB.set(false);
   }
 
   public void armDown() {
     armPistonA.set(false);
-    armPistonB.set(false);
+    armPistonB.set(true);
+  }
+
+  public void toggle() {
+    if(armPistonA.get()) {
+      armDown();
+    } else {
+      armUp();
+    }
   }
 
   @Override
