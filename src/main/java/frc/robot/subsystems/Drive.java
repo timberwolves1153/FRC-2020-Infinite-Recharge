@@ -17,6 +17,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
@@ -261,6 +262,15 @@ public class Drive extends SubsystemBase {
 
   public CANEncoder getRightEncoder() {
     return rightEncoder;
+  }
+
+  public void resetEncoders() {
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+  }
+
+  public void setSetpoint(TrapezoidProfile.State setpointIn) {
+    setpoint = setpointIn.velocity;
   }
 
   public boolean getPIDEnabled() {
