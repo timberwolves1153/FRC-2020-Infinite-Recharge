@@ -77,7 +77,7 @@ public class Shoot extends CommandBase {
   @Override
   public boolean isFinished() {
     if(isAuto) {
-      return (System.currentTimeMillis() - startTime) > 3;
+      return (System.currentTimeMillis() - startTime) > 5000;
     } else {
       return false;
     }

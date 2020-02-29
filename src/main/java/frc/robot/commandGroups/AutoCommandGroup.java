@@ -9,6 +9,7 @@ package frc.robot.commandGroups;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
+import frc.robot.commands.DriveForEncoder;
 import frc.robot.commands.DriveForEncoderWithCollector;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.TurnForAngleCommand;
@@ -29,19 +30,13 @@ public class AutoCommandGroup extends SequentialCommandGroup {
   public AutoCommandGroup(Drive drive, LimelightVision vision, Shooter shooter, Indexer indexer, RobotContainer robotContainer) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    /*
-    super(new TurnWithLimelight(drive, vision), 
-    new Shoot(shooter), 
-    new TurnForAngleCommand(-Robot.m_robotContainer.lastLimelightTurnAngleDifference, 0.5, drive), 
-    new DriveForEncoderWithCollector(100, 1, drive, indexer), 
-    new TurnWithLimelight(drive, vision),
-    new Shoot(shooter));
-    */
-    addCommands(new TurnWithLimelight(drive, vision));
+    /*addCommands(new TurnWithLimelight(drive, vision));
     addCommands(new Shoot(shooter, vision, ShooterPosition.AUTO_LINE, true));
     addCommands(new TurnForAngleCommand(-robotContainer.lastLimelightTurnAngleDifference, 0.5, drive));
     addCommands(new DriveForEncoderWithCollector(10, 1, drive, indexer));
     addCommands(new TurnWithLimelight(drive, vision));
-    addCommands(new Shoot(shooter, vision, ShooterPosition.CR_CLOSE, true));
+    addCommands(new Shoot(shooter, vision, ShooterPosition.CR_CLOSE, true));*/
+    addCommands(new Shoot(shooter, vision, ShooterPosition.AUTO_LINE, true));
+    addCommands(new DriveForEncoder(drive, 0.6, -1, 60));
   }
 }
