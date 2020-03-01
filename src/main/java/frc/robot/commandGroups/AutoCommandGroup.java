@@ -36,7 +36,7 @@ public class AutoCommandGroup extends SequentialCommandGroup {
     addCommands(new DriveForEncoderWithCollector(10, 1, drive, indexer));
     addCommands(new TurnWithLimelight(drive, vision));
     addCommands(new Shoot(shooter, vision, ShooterPosition.CR_CLOSE, true));*/
-    addCommands(new Shoot(shooter, vision, ShooterPosition.AUTO_LINE, true));
-    addCommands(new DriveForEncoder(drive, 0.6, -1, 60));
+    addCommands(new Shoot(shooter, indexer, vision, ShooterPosition.AUTO_LINE, true));
+    addCommands(new DriveForEncoder(drive, 0.6, 1, 25));
   }
 }

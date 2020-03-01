@@ -9,6 +9,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterPosition;
@@ -16,6 +17,7 @@ import frc.robot.subsystems.Shooter.ShooterPosition;
 public class Shoot extends CommandBase {
   private Shooter shooter;
   private LimelightVision vision;
+  private Indexer indexer;
 
   private ShooterPosition shooterPosition;
   private long startTime;
@@ -23,15 +25,16 @@ public class Shoot extends CommandBase {
   /**
    * Creates a new Shoot.
    */
-  public Shoot(Shooter shooter, LimelightVision vision, ShooterPosition shooterPosition, boolean isAuto) {
+  public Shoot(Shooter shooter, Indexer indexer, LimelightVision vision, ShooterPosition shooterPosition, boolean isAuto) {
     addRequirements(shooter);
     this.shooter = shooter;
     this.vision = vision;
+    this.indexer = indexer;
     this.shooterPosition = shooterPosition;
     this.isAuto = isAuto;
   }
-  public Shoot(Shooter shooter, LimelightVision vision, boolean isAuto) {
-    this(shooter, vision, shooter.getSelectedPosition(), isAuto);
+  public Shoot(Shooter shooter, Indexer indexer, LimelightVision vision, boolean isAuto) {
+    this(shooter, indexer, vision, shooter.getSelectedPosition(), isAuto);
   }
 
   // Called when the command is initially scheduled.
@@ -58,9 +61,13 @@ public class Shoot extends CommandBase {
       this.shooterPosition = shooterPosition;
     }*/
     if(shooter.isAtSetpoint()) {
-      shooter.setFeederSpeed(1);
+      shooter.setFeederSpeed(-1);
+      indexer.kick();
+      indexer.startVIndexer();
     } else {
       shooter.setFeederSpeed(0);
+      indexer.stop();
+      indexer.stopVIndexer();
     }
   }
 
@@ -71,6 +78,8 @@ public class Shoot extends CommandBase {
     shooter.resetGainPreset();
     shooter.setSpeed(0);
     shooter.setFeederSpeed(0);
+    indexer.stop();
+    indexer.stopVIndexer();
   }
 
   // Returns true when the command should end.

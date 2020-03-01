@@ -44,6 +44,12 @@ public class TurnWithLimelight extends PIDCommand {
     this.drive = drive;
     this.vision = vision;
   }
+  @Override
+  public void initialize() {
+    super.initialize();
+    vision.setLedMode(3);
+    vision.setPipeline(8);
+  }
 
   // Returns true when the command should end.
   @Override
@@ -55,11 +61,13 @@ public class TurnWithLimelight extends PIDCommand {
       canFinishCommand = false;
     }
     counter++;
-    return canFinishCommand && getController().atSetpoint();
+    //return canFinishCommand && getController().atSetpoint();
+    return false;
   }
 
   @Override
   public void end(boolean interrupted) {
+    vision.setLedMode(1);
     vision.setPipeline(0);
     drive.arcadeDrive(0, 0);
     Robot.m_robotContainer.lastLimelightTurnAngleDifference = drive.getImuAngle() - initialGyroAngle;

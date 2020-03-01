@@ -22,7 +22,7 @@ public class LimelightVision extends PIDSubsystem {
     public LimelightVision() {
 		//super(new PIDController(0.05, 0, 0.01));
 		//super(new PIDController(0.05, 0, 0.0025));
-		super(new PIDController(0.05, 0, 0.0040));
+		super(new PIDController(0.038, 0, 0.0040));
     	table = NetworkTableInstance.getDefault().getTable("limelight");
     	
     	//horizontalAlignPid = new PIDController(0.05, 0, 0.01);
@@ -135,6 +135,11 @@ public class LimelightVision extends PIDSubsystem {
 		NetworkTableEntry camModeEntry = table.getEntry("camMode");
 		camModeEntry.setNumber(camMode);
 
+	}
+
+	public void setLedMode(int ledMode) {
+		NetworkTableEntry ledModeEntry = table.getEntry("ledMode");
+		ledModeEntry.setNumber(ledMode);
 	}
 
 	public double findDistance(double h1, double h2, double a1, double a2)  {

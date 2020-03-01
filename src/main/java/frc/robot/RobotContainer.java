@@ -31,6 +31,7 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.Direction;
+import frc.robot.subsystems.Shooter.ShooterPosition;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -110,10 +111,10 @@ public class RobotContainer {
     autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
     runDrivePID = new RunDrivePID(drive);
     turnWithLimelight = new TurnWithLimelight(drive, vision);
-    shoot = new Shoot(shooter, vision, false);
+    shoot = new Shoot(shooter, indexer, vision, false);
     teleOpDriveSide = -1;
 
-    chooseAutoCommand.setDefaultOption("Drive off Auto Line", new DriveForEncoder(drive, 0.6, -1, 60));
+    chooseAutoCommand.setDefaultOption("Drive off Auto Line", new DriveForEncoder(drive, 0.6, 1, 25));
     chooseAutoCommand.addOption("Limelight Vision Command", new TurnWithLimelight(drive, vision));
     chooseAutoCommand.addOption("Auto Command Group", autoCommandGroup);
     SmartDashboard.putData("Auto Selector", chooseAutoCommand);
@@ -168,8 +169,10 @@ public class RobotContainer {
     opX.whenPressed(new InstantCommand(climber::toggle, climber));
     //opX.whenReleased(new InstantCommand(climber::armDown, climber));
 
-    opLeftJoystickButton.whenPressed(() -> shooter.cycleGainPreset(Direction.kForwards), shooter);
-    opRightJoystickButton.whenPressed(() -> shooter.cycleGainPreset(Direction.kBackwards), shooter);
+    /*opLeftJoystickButton.whenPressed(() -> shooter.cycleGainPreset(Direction.kForwards), shooter);
+    opRightJoystickButton.whenPressed(() -> shooter.cycleGainPreset(Direction.kBackwards), shooter);*/
+    opLeftJoystickButton.whenPressed(() -> shooter.setGainPreset(ShooterPosition.AUTO_LINE));
+    opRightJoystickButton.whenPressed(() -> shooter.setGainPreset(ShooterPosition.CR_CLOSE));
 
     drStart.whenPressed(turnWithLimelight);
     drStart.whenReleased(() -> CommandScheduler.getInstance().cancel(turnWithLimelight));
