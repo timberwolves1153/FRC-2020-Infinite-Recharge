@@ -21,6 +21,7 @@ import frc.robot.commands.DefaultClimb;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DefaultShooter;
 import frc.robot.commands.DriveForEncoder;
+import frc.robot.commands.MotionProfileCommand;
 import frc.robot.commands.RunDrivePID;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.TurnWithLimelight;
@@ -71,6 +72,7 @@ public class RobotContainer {
     private AutoCommandGroup autoCommandGroup;
 
     private RunDrivePID runDrivePID;
+    private MotionProfileCommand profileCommand;
     private TurnWithLimelight turnWithLimelight;
     private Shoot shoot;
 
@@ -110,6 +112,7 @@ public class RobotContainer {
 
     autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
     runDrivePID = new RunDrivePID(drive);
+    profileCommand = new MotionProfileCommand(240, drive);
     turnWithLimelight = new TurnWithLimelight(drive, vision);
     shoot = new Shoot(shooter, indexer, vision, false);
     teleOpDriveSide = -1;
@@ -199,8 +202,10 @@ public class RobotContainer {
       drive.getDefaultCommand().schedule();
     });*/
 
-    drX.whenPressed(runDrivePID);
-    drX.whenReleased(() -> CommandScheduler.getInstance().cancel(runDrivePID));
+    /*drX.whenPressed(runDrivePID);
+    drX.whenReleased(() -> CommandScheduler.getInstance().cancel(runDrivePID));*/
+    drX.whenPressed(profileCommand);
+    drX.whenReleased(() -> profileCommand.cancel());
     
     //opBack.whenHeld(new TurnWithLimelight(drive, vision));
     

@@ -19,12 +19,12 @@ public class MotionProfileCommand extends TrapezoidProfileCommand {
   /**
    * Cruising (maximum) speed, denoted in inches per second
    */
-  private static final double kMaxSpeed = 48;
+  private static final double kMaxSpeed = 60;
 
   /**
    * Rate of change in speed, denoted in inches per second squared
    */
-  private static final double kMaxAcceleration = 24;
+  private static final double kMaxAcceleration = 48;
 
   private Drive drive;
 
@@ -46,14 +46,15 @@ public class MotionProfileCommand extends TrapezoidProfileCommand {
         drive);
 
     this.drive = drive;
-
+    
     // Reset drive encoders since we're starting at 0
-    drive.resetEncoders();
+    
   }
 
   @Override
   public void initialize() {
     super.initialize();
+    drive.resetEncoders();
     drive.pidOn();
   }
 

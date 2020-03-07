@@ -243,9 +243,9 @@ public class Drive extends SubsystemBase {
   }
 
   private void pidPeriodic() {
-    setpoint = SmartDashboard.getNumber("Setpoint", 0);
-    leftPID.setReference(setpoint, ControlType.kSmartVelocity, 0);
-    rightPID.setReference(-setpoint, ControlType.kSmartVelocity, 0);
+    //setpoint = SmartDashboard.getNumber("Setpoint", 0);
+    leftPID.setReference(setpoint, ControlType.kVelocity, 0);
+    rightPID.setReference(-setpoint, ControlType.kVelocity, 0);
   }
 
   public void setMotorIdleMode(IdleMode mode) {
