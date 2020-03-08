@@ -65,8 +65,8 @@ public class Indexer extends SubsystemBase {
   }
 
   public void collect() {
-    insideCollectRoller.set(ControlMode.PercentOutput, -1);
-    outsideCollectRoller.set(ControlMode.PercentOutput, 1);
+    insideCollectRoller.set(ControlMode.PercentOutput, -0.8);
+    outsideCollectRoller.set(ControlMode.PercentOutput, 0.8);
   }
 
   public void dispense() {
@@ -75,7 +75,7 @@ public class Indexer extends SubsystemBase {
   }
 
   public void kick() {
-    insideCollectRoller.set(ControlMode.PercentOutput, -.5);
+    insideCollectRoller.set(ControlMode.PercentOutput, -.8);
   }
 
   public void stop() {

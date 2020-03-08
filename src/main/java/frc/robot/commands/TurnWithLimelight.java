@@ -48,7 +48,7 @@ public class TurnWithLimelight extends PIDCommand {
   public void initialize() {
     super.initialize();
     vision.setLedMode(3);
-    vision.setPipeline(8);
+    vision.setPipeline(7);
   }
 
   // Returns true when the command should end.

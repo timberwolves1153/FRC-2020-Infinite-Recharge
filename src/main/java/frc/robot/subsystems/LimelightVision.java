@@ -22,7 +22,7 @@ public class LimelightVision extends PIDSubsystem {
     public LimelightVision() {
 		//super(new PIDController(0.05, 0, 0.01));
 		//super(new PIDController(0.05, 0, 0.0025));
-		super(new PIDController(0.038, 0, 0.0040));
+		super(new PIDController(0.038, 0.008, 0.0040));
     	table = NetworkTableInstance.getDefault().getTable("limelight");
     	
     	//horizontalAlignPid = new PIDController(0.05, 0, 0.01);
