@@ -269,8 +269,8 @@ public class Drive extends SubsystemBase {
     rightEncoder.setPosition(0);
   }
 
-  public void setSetpoint(TrapezoidProfile.State setpointIn) {
-    setpoint = setpointIn.velocity;
+  public void setSetpoint(double setpointIn) {
+    setpoint = setpointIn;
   }
 
   public boolean getPIDEnabled() {

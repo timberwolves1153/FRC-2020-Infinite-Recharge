@@ -41,7 +41,8 @@ public class MotionProfileCommand extends TrapezoidProfileCommand {
         // End at desired position in inches; implicitly starts at 0
         new TrapezoidProfile.State(inches, 0)),
         // Pipe the profile state to the drive
-        setpointState -> drive.setSetpoint(setpointState),
+        //setpointState -> drive.setSetpoint(setpointState),
+        setpointState -> {},
         // Require the drive
         drive);
 
