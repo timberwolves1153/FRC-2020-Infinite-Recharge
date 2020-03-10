@@ -287,13 +287,13 @@ public class Drive extends SubsystemBase {
 
   public void lightOn() {
     flashlight.set(true);
-    flashlightRelay.set(Value.kForward);
+   // flashlightRelay.set(Value.kForward);
     System.out.println("Turning Relay On");
   }
 
   public void lightOff() {
-    flashlight.set(true);
-    flashlightRelay.set(Value.kReverse);
+    flashlight.set(false);
+   // flashlightRelay.set(Value.kReverse);
   }
 
   @Override

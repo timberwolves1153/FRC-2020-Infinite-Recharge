@@ -190,18 +190,9 @@ public class RobotContainer {
     drX.whenReleased(() -> CommandScheduler.getInstance().cancel(runDrivePID));*/
     drX.whenPressed(profileCommand);
     drX.whenReleased(() -> profileCommand.cancel());
-    
-    /*drBumpLeft.whenPressed(alignLeft);
-    drBumpLeft.whenReleased(() -> alignLeft.cancel());
-
-    drBumpRight.whenPressed(alignRight);
-    drBumpRight.whenReleased(() -> alignRight.cancel());*/
 
     drBumpLeft.whenPressed(new InstantCommand(drive::lightOn, drive));
     drBumpLeft.whenReleased(new InstantCommand(drive::lightOff, drive));
-
-    drBumpRight.whenPressed(new InstantCommand(drive::lightOn, drive));
-    drBumpRight.whenReleased(new InstantCommand(drive::lightOff, drive));
   }
 
   public void updateDashboard() {
