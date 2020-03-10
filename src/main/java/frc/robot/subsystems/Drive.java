@@ -15,9 +15,11 @@ import com.revrobotics.ControlType;
 import com.revrobotics.CANPIDController.AccelStrategy;
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
 
@@ -51,6 +53,9 @@ public class Drive extends SubsystemBase {
 
   private DifferentialDrive differentialDrive;
 
+  private Solenoid flashlight;
+  private Relay flashlightRelay;
+
   /**
    * Creates a new Drive.
    */
@@ -66,6 +71,9 @@ public class Drive extends SubsystemBase {
 
     leftPID = leftMaster.getPIDController();
     rightPID = rightMaster.getPIDController();
+
+    flashlight = new Solenoid(4);
+    flashlightRelay = new Relay(0);
 
     configSparkParams();
 
@@ -275,6 +283,17 @@ public class Drive extends SubsystemBase {
 
   public boolean getPIDEnabled() {
     return pidEnabled;
+  }
+
+  public void lightOn() {
+    //flashlight.set(true);
+    flashlightRelay.set(Value.kForward);
+    System.out.println("Turning Relay On");
+  }
+
+  public void lightOff() {
+    //flashlight.set(true);
+    flashlightRelay.set(Value.kReverse);
   }
 
   @Override

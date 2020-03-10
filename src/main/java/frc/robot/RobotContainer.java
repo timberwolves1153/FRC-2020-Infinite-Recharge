@@ -17,9 +17,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 //import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commandGroups.AutoCommandGroup;
-import frc.robot.commands.DefaultClimb;
+import frc.robot.commands.AlignWithFlashlight;
 import frc.robot.commands.DefaultDrive;
-import frc.robot.commands.DefaultShooter;
 import frc.robot.commands.DriveForEncoder;
 import frc.robot.commands.MotionProfileCommand;
 import frc.robot.commands.RunDrivePID;
@@ -31,7 +30,6 @@ import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.LimelightVision;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Shooter.Direction;
 import frc.robot.subsystems.Shooter.ShooterPosition;
 
 /**
@@ -67,6 +65,8 @@ public class RobotContainer {
 
     private JoystickButton drStart;
     private JoystickButton drX;
+    private JoystickButton drBumpLeft;
+    private JoystickButton drBumpRight;
 
     private SendableChooser<Command> chooseAutoCommand = new SendableChooser<>();
     private AutoCommandGroup autoCommandGroup;
@@ -75,6 +75,8 @@ public class RobotContainer {
     private MotionProfileCommand profileCommand;
     private TurnWithLimelight turnWithLimelight;
     private Shoot shoot;
+    private AlignWithFlashlight alignRight;
+    private AlignWithFlashlight alignLeft;
 
     public int teleOpDriveSide;
 
@@ -104,22 +106,26 @@ public class RobotContainer {
     opBack = new JoystickButton(operator, XboxController.Button.kBack.value);
     opLeftJoystickButton = new JoystickButton(operator, XboxController.Button.kStickLeft.value);
     opRightJoystickButton = new JoystickButton(operator, XboxController.Button.kStickRight.value);
-    //opPOVUp = new POVButton(operator, 0);
-    //opPOVDown = new POVButton(operator, 0);
 
     drStart = new JoystickButton(driver, XboxController.Button.kStart.value);
     drX = new JoystickButton(driver, XboxController.Button.kX.value);
+    drBumpLeft = new JoystickButton(driver, XboxController.Button.kBumperLeft.value);
+    drBumpRight = new JoystickButton(driver, XboxController.Button.kBumperRight.value);
 
+    //Initialize commands that require repetition
     autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
     runDrivePID = new RunDrivePID(drive);
     profileCommand = new MotionProfileCommand(240, drive);
     turnWithLimelight = new TurnWithLimelight(drive, vision);
     shoot = new Shoot(shooter, indexer, vision, false);
+    alignRight = new AlignWithFlashlight(0.5, drive);
+    alignLeft = new AlignWithFlashlight(-0.5, drive);
+
     teleOpDriveSide = -1;
 
-    chooseAutoCommand.setDefaultOption("Drive off Auto Line", new DriveForEncoder(drive, 0.6, 1, 25));
+    chooseAutoCommand.setDefaultOption("Auto Command Group", autoCommandGroup);
+    chooseAutoCommand.addOption("Drive off Auto Line", new DriveForEncoder(drive, 0.6, 1, 25));
     chooseAutoCommand.addOption("Limelight Vision Command", new TurnWithLimelight(drive, vision));
-    chooseAutoCommand.addOption("Auto Command Group", autoCommandGroup);
     SmartDashboard.putData("Auto Selector", chooseAutoCommand);
 
     configureButtonBindings();
@@ -180,35 +186,22 @@ public class RobotContainer {
     drStart.whenPressed(turnWithLimelight);
     drStart.whenReleased(() -> CommandScheduler.getInstance().cancel(turnWithLimelight));
 
-    /*drStart.whileHeld(() -> {
-      if(drive.getDefaultCommand().isScheduled()){
-        drive.getDefaultCommand().cancel();
-      }
-      vision.turnWithLimelight(output -> {
-        if(output < 0.25) {
-          drive.arcadeDrive(0, output * 1.5);
-          System.out.println(output * 1.5);
-        } else {
-          drive.arcadeDrive(0, output);
-          System.out.println(output);
-        }
-        //drive.arcadeDrive(0, output);
-        System.out.println(output);
-      }, false);
-      //vision.turnWithLimelight(output -> System.out.println(output), false);
-    });
-    drStart.whenReleased(() -> {
-      vision.turnWithLimelight(output -> drive.arcadeDrive(0, output), true);
-      drive.getDefaultCommand().schedule();
-    });*/
-
     /*drX.whenPressed(runDrivePID);
     drX.whenReleased(() -> CommandScheduler.getInstance().cancel(runDrivePID));*/
     drX.whenPressed(profileCommand);
     drX.whenReleased(() -> profileCommand.cancel());
     
-    //opBack.whenHeld(new TurnWithLimelight(drive, vision));
-    
+    /*drBumpLeft.whenPressed(alignLeft);
+    drBumpLeft.whenReleased(() -> alignLeft.cancel());
+
+    drBumpRight.whenPressed(alignRight);
+    drBumpRight.whenReleased(() -> alignRight.cancel());*/
+
+    drBumpLeft.whenPressed(new InstantCommand(drive::lightOn, drive));
+    drBumpLeft.whenReleased(new InstantCommand(drive::lightOff, drive));
+
+    drBumpRight.whenPressed(new InstantCommand(drive::lightOn, drive));
+    drBumpRight.whenReleased(new InstantCommand(drive::lightOff, drive));
   }
 
   public void updateDashboard() {
