@@ -91,7 +91,7 @@ public class Shooter extends SubsystemBase {
 
   private double p, i, d, f, setpoint;
 
-  private ShooterPosition defaultPosition = ShooterPosition.CR_CLOSE;
+  private ShooterPosition defaultPosition = ShooterPosition.AUTO_LINE;
   private ShooterPosition selectedPosition;
 
   private static final double MAX_OUTPUT = 1;
