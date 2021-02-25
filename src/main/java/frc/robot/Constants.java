@@ -34,6 +34,13 @@ public class Constants {
     public static final double DOWNTOWN_MAX_AREA = 0;
     public static final double DOWNTOWN_MIN_AREA = 0;
 
+    //Encoder Constants
+    public static final double kWheelDiameter = 6;
+    public static final double kGearing = 14.933333333;
+    public static final double kEncoderCPR = 42;
+    public static final double kEncoderConstant = 1 / kGearing;
+    //public static final double kEncoderToDistanceMetersConversionFactor = 
+
     //Ramsete Command Constants
     public static final double ksVolts = 0.139;
     public static final double kvVoltSecondsPerMeter = 3.86;

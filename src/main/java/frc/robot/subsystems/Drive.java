@@ -336,5 +336,6 @@ public class Drive extends SubsystemBase {
     if (pidEnabled) {
       pidPeriodic();
     }
+    odometry.update(imu.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
   }
 }
