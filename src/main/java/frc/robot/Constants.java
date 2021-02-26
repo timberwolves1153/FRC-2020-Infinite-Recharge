@@ -42,13 +42,13 @@ public class Constants {
     //public static final double kEncoderToDistanceMetersConversionFactor = 
 
     //Ramsete Command Constants
-    public static final double ksVolts = 0.139;
-    public static final double kvVoltSecondsPerMeter = 3.86;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.494;
+    public static final double ksVolts = 0.159;
+    public static final double kvVoltSecondsPerMeter = 3.87;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.503;
 
     public static final double kPDriveVel = 0.05;
 
-    public static final double kTrackwidthMeters = 0.5588;
+    public static final double kTrackwidthMeters = 1.330086493020229;
     public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(kTrackwidthMeters);
 

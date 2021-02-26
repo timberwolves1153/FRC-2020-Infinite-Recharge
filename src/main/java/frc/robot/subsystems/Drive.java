@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.RobotMap;
 
 public class Drive extends SubsystemBase {
@@ -38,6 +39,8 @@ public class Drive extends SubsystemBase {
   // Drivetrain Motor encoders
   private CANEncoder leftEncoder;
   private CANEncoder rightEncoder;
+
+  private double encoderPositionMetersConversionFactor = (Constants.kWheelDiameter * Math.PI) / (Constants.kEncoderCPR * Constants.kGearing);
 
   private boolean pidEnabled = false;
 
@@ -128,6 +131,9 @@ public class Drive extends SubsystemBase {
     leftEncoder.setVelocityConversionFactor(0.0315561762079);
     rightEncoder.setVelocityConversionFactor(0.0315561762079);
 
+    leftEncoder.setPositionConversionFactor(encoderPositionMetersConversionFactor);
+    rightEncoder.setPositionConversionFactor(encoderPositionMetersConversionFactor);
+
     // Trapezoidal Motion Profiling Parameters
     maxVelocity = 24;
     minOutputVelocity = 0;
@@ -186,6 +192,7 @@ public class Drive extends SubsystemBase {
     SmartDashboard.putNumber("Left Power", leftMaster.get());
     SmartDashboard.putNumber("Right Encoder", rightEncoder.getPosition());
     SmartDashboard.putNumber("Left Encoder", leftEncoder.getPosition());
+    SmartDashboard.putNumber("Gyro Reading", imu.getRotation2d().getDegrees());
 
     double p = SmartDashboard.getNumber("P Gain", 0);
     double i = SmartDashboard.getNumber("I Gain", 0);
@@ -337,5 +344,8 @@ public class Drive extends SubsystemBase {
       pidPeriodic();
     }
     odometry.update(imu.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
+    var translation = odometry.getPoseMeters().getTranslation();
+    SmartDashboard.putNumber("Odometry X", translation.getX());
+    SmartDashboard.putNumber("Odometry Y", translation.getY());
   }
 }
