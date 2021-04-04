@@ -13,10 +13,10 @@ package frc.robot;
 public class RobotMap {
 
     // Drivetrain Neos
-	public static final int LEFT_MASTER = 15;
-	public static final int LEFT_FOLLOWER_A = 14;
-	public static final int RIGHT_MASTER = 20;
-	public static final int RIGHT_FOLLOWER_A = 1;
+	public static final int LEFT_MASTER = 20;
+	public static final int LEFT_FOLLOWER_A = 1;
+	public static final int RIGHT_MASTER = 15;
+	public static final int RIGHT_FOLLOWER_A = 14;
 
 	// Collector
 	public static final int INSIDE_COLLECT_ROLLER_MOTOR = 4;

@@ -7,6 +7,9 @@
 
 package frc.robot.subsystems;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.analog.adis16470.frc.ADIS16470_IMU;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
@@ -17,12 +20,17 @@ import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Relay.Value;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
@@ -63,6 +71,16 @@ public class Drive extends SubsystemBase {
   private Relay flashlightRelay;
 
   private DifferentialDriveOdometry odometry;
+  private DifferentialDriveKinematics kinematics;
+
+  private Pose2d pose;
+
+  private final Field2d m_field;
+
+  private SimpleMotorFeedforward feedforward;
+
+  private PIDController leftPIDController;
+  private PIDController rightPIDController;
 
   /**
    * Creates a new Drive.
@@ -84,10 +102,21 @@ public class Drive extends SubsystemBase {
     flashlightRelay = new Relay(0);
 
     odometry = new DifferentialDriveOdometry(imu.getRotation2d());
+    kinematics = new DifferentialDriveKinematics(Constants.kTrackwidthMeters);
+
+    feedforward = new SimpleMotorFeedforward(Constants.ksVolts, 
+                                             Constants.kvVoltSecondsPerMeter, 
+                                             Constants.kaVoltSecondsSquaredPerMeter);
+
+    leftPIDController = new PIDController(Constants.kPDriveVel, 0, 0);
+    rightPIDController = new PIDController(Constants.kPDriveVel, 0, 0);
 
     configSparkParams();
 
     differentialDrive = new DifferentialDrive(leftMaster, rightMaster);
+
+    m_field = new Field2d();
+    SmartDashboard.putData("Field", m_field);
   }
 
   private void configSparkParams() {
@@ -180,8 +209,14 @@ public class Drive extends SubsystemBase {
   }
 
   public void tankDriveVolts(double leftVolts, double rightVolts) {
-    rightMaster.setVoltage(leftVolts);
-    leftMaster.setVoltage(-rightVolts);
+    leftMaster.setVoltage(leftVolts);
+    rightMaster.setVoltage(-rightVolts);
+    differentialDrive.feed();
+  }
+
+  public void setOutput(double leftVolts, double rightVolts) {
+    leftMaster.set(leftVolts / 12);
+    rightMaster.set(rightVolts / 12);
     differentialDrive.feed();
   }
 
@@ -297,6 +332,26 @@ public class Drive extends SubsystemBase {
     rightEncoder.setPosition(0);
   }
 
+  public Pose2d getPose() {
+    return pose;
+  }
+
+  public SimpleMotorFeedforward getFeedforward() {
+    return feedforward;
+  }
+
+  public DifferentialDriveKinematics getKinematics() {
+    return kinematics;
+  }
+
+  public PIDController getLeftRamsetePIDController() {
+    return leftPIDController;
+  }
+
+  public PIDController getRightRamsetePIDController() {
+    return rightPIDController;
+  }
+
   public void setSetpoint(double setpointIn) {
     setpoint = setpointIn;
   }
@@ -324,10 +379,6 @@ public class Drive extends SubsystemBase {
    // flashlightRelay.set(Value.kReverse);
   }
 
-  public Pose2d getPose() {
-    return odometry.getPoseMeters();
-  }
-
   public void resetOdometry(Pose2d pose) {
     resetEncoders();
     resetImu();
@@ -335,7 +386,20 @@ public class Drive extends SubsystemBase {
   }
 
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity());
+    return new DifferentialDriveWheelSpeeds(
+      leftEncoder.getVelocity() / 14.933333333 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60, 
+      -rightEncoder.getVelocity() / 14.933333333 * 2 * Math.PI * Units.inchesToMeters(3.0) / 60);
+  }
+
+  public void plotTrajectory(Trajectory trajectory) {
+    m_field.getObject("trajectory").setPoses(
+      trajectory.getStates().stream()
+        .map(state -> state.poseMeters)
+        .collect(Collectors.toList()));
+  }
+  
+  public void plotWaypoints(List<Pose2d> waypoints) {
+    m_field.getObject("waypoints").setPoses(waypoints);
   }
 
   @Override
@@ -343,9 +407,11 @@ public class Drive extends SubsystemBase {
     if (pidEnabled) {
       pidPeriodic();
     }
-    odometry.update(imu.getRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition());
-    var translation = odometry.getPoseMeters().getTranslation();
-    SmartDashboard.putNumber("Odometry X", translation.getX());
-    SmartDashboard.putNumber("Odometry Y", translation.getY());
+    pose = odometry.update(imu.getRotation2d(), 
+    leftEncoder.getPosition() / 14.933333333 * 2 * Math.PI * Units.inchesToMeters(3.0),
+    -rightEncoder.getPosition() / 14.933333333 * 2 * Math.PI * Units.inchesToMeters(3.0));
+    m_field.setRobotPose(pose);
+    SmartDashboard.putNumber("Odometry X", pose.getX());
+    SmartDashboard.putNumber("Odometry Y", pose.getY());
   }
 }

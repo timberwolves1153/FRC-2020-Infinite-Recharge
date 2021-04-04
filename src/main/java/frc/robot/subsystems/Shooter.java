@@ -194,6 +194,7 @@ public class Shooter extends SubsystemBase {
       pidEnabled = true;
       shooterPID.setIAccum(0);
     }
+    setFeederSpeed(-0.8);
   }
 
   /**
@@ -202,6 +203,7 @@ public class Shooter extends SubsystemBase {
   public void pidOff() {
     pidEnabled = false;
     motorA.set(0);
+    setFeederSpeed(0);
   }
 
   /**

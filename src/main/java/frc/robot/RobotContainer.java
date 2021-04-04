@@ -8,27 +8,25 @@
 package frc.robot;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-//import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commandGroups.AutoCommandGroup;
 import frc.robot.commands.AlignWithFlashlight;
 import frc.robot.commands.DefaultDrive;
@@ -37,6 +35,7 @@ import frc.robot.commands.MotionProfileCommand;
 import frc.robot.commands.RunDrivePID;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.TurnWithLimelight;
+import frc.robot.subsystems.ChameleonVision;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Drive;
@@ -58,7 +57,8 @@ public class RobotContainer {
     private Indexer indexer;
     private ColorSensor colorSensor;
     private Climber climber;
-    private LimelightVision vision;
+    private LimelightVision limelightVision;
+    private ChameleonVision chameleonVision;
 
     private XboxController driver;
     private XboxController operator;
@@ -81,8 +81,11 @@ public class RobotContainer {
     private JoystickButton drBumpLeft;
     private JoystickButton drBumpRight;
 
-    private SendableChooser<Command> chooseAutoCommand = new SendableChooser<>();
+    private SendableChooser<Supplier<Command>> chooseAutoCommand = new SendableChooser<>();
+    private SendableChooser<Trajectory> trajectoryChooser = new SendableChooser<>();
+
     private AutoCommandGroup autoCommandGroup;
+    private SequentialCommandGroup bouncePathCommandGroup;
 
     private RunDrivePID runDrivePID;
     private MotionProfileCommand profileCommand;
@@ -90,6 +93,19 @@ public class RobotContainer {
     private Shoot shoot;
     private AlignWithFlashlight alignRight;
     private AlignWithFlashlight alignLeft;
+
+    private Trajectory slalomTrajectory;
+    private Trajectory bounceTrajectory1;
+    private Trajectory bounceTrajectory2;
+    private Trajectory bounceTrajectory3;
+    private Trajectory bounceTrajectory4;
+    private Trajectory barrelTrajectory;
+    private Trajectory redGalacticTrajectoryA;
+    private Trajectory redGalacticTrajectoryB;
+    private Trajectory blueGalacticTrajectoryA;
+    private Trajectory blueGalacticTrajectoryB;
+
+    private double dxy;
 
     public int teleOpDriveSide;
 
@@ -104,7 +120,8 @@ public class RobotContainer {
     indexer = new Indexer();
     colorSensor = new ColorSensor();
     climber = new Climber();
-    vision = new LimelightVision();
+    limelightVision = new LimelightVision();
+    chameleonVision = new ChameleonVision();
 
     driver = new XboxController(0);
     operator = new XboxController(1);
@@ -126,25 +143,52 @@ public class RobotContainer {
     drBumpRight = new JoystickButton(driver, XboxController.Button.kBumperRight.value);
 
     //Initialize commands that require repetition
-    autoCommandGroup = new AutoCommandGroup(drive, vision, shooter, indexer, this);
+    autoCommandGroup = new AutoCommandGroup(drive, limelightVision, shooter, indexer, this);
     runDrivePID = new RunDrivePID(drive);
     profileCommand = new MotionProfileCommand(240, drive);
-    turnWithLimelight = new TurnWithLimelight(drive, vision);
-    shoot = new Shoot(shooter, indexer, vision, false);
+    turnWithLimelight = new TurnWithLimelight(drive, limelightVision);
+    shoot = new Shoot(shooter, indexer, limelightVision, false);
     alignRight = new AlignWithFlashlight(0.5, drive);
     alignLeft = new AlignWithFlashlight(-0.5, drive);
 
     teleOpDriveSide = -1;
 
-    chooseAutoCommand.setDefaultOption("Auto Command Group", autoCommandGroup);
-    chooseAutoCommand.addOption("Drive off Auto Line", new DriveForEncoder(drive, 0.6, 1, 25));
-    chooseAutoCommand.addOption("Limelight Vision Command", new TurnWithLimelight(drive, vision));
-    chooseAutoCommand.addOption("Ramsete Command", generateRamseteCommand());
-    SmartDashboard.putData("Auto Selector", chooseAutoCommand);
+    dxy = Units.inchesToMeters(30);
 
     configureButtonBindings();
-
+    generateTrajectories();
     //LiveWindow.disableAllTelemetry();
+
+    bouncePathCommandGroup = new SequentialCommandGroup(
+      new InstantCommand(() -> drive.resetOdometry(bounceTrajectory1.getInitialPose())),
+      generateRamseteCommand(bounceTrajectory1),
+      new InstantCommand(() -> drive.resetOdometry(bounceTrajectory2.getInitialPose())),
+      generateRamseteCommand(bounceTrajectory2),
+      new InstantCommand(() -> drive.resetOdometry(bounceTrajectory3.getInitialPose())),
+      generateRamseteCommand(bounceTrajectory3),
+      new InstantCommand(() -> drive.resetOdometry(bounceTrajectory4.getInitialPose())),
+      generateRamseteCommand(bounceTrajectory4)
+    );
+
+    trajectoryChooser.setDefaultOption("Slalom", slalomTrajectory);
+    trajectoryChooser.addOption("Bounce 1", bounceTrajectory1);
+    trajectoryChooser.addOption("Bounce 2", bounceTrajectory2);
+    trajectoryChooser.addOption("Bounce 3", bounceTrajectory3);
+    trajectoryChooser.addOption("Bounce 4", bounceTrajectory4);
+    trajectoryChooser.addOption("Barrel", barrelTrajectory);
+    trajectoryChooser.addOption("Red Galactic A", redGalacticTrajectoryA);
+    trajectoryChooser.addOption("Red Galactic B", redGalacticTrajectoryB);
+    trajectoryChooser.addOption("Blue Galactic A", blueGalacticTrajectoryA);
+    trajectoryChooser.addOption("Blue Galactic B", blueGalacticTrajectoryB);
+
+    chooseAutoCommand.setDefaultOption("Auto Command Group", () -> autoCommandGroup);
+    chooseAutoCommand.addOption("Drive off Auto Line", () -> new DriveForEncoder(drive, 0.6, 1, 25));
+    chooseAutoCommand.addOption("Limelight Vision Command", () -> new TurnWithLimelight(drive, limelightVision));
+    chooseAutoCommand.addOption("Ramsete Command From Trajectory", () -> generateRamseteCommand(trajectoryChooser.getSelected()));
+    chooseAutoCommand.addOption("Bounce Path Command Group", () -> bouncePathCommandGroup);
+
+    SmartDashboard.putData("Trajectory Selector", trajectoryChooser);
+    SmartDashboard.putData("Auto Selector", chooseAutoCommand);
 
     drive.setDefaultCommand(new DefaultDrive(drive,
         () -> driver.getRawAxis(1),
@@ -209,96 +253,156 @@ public class RobotContainer {
     drBumpLeft.whenReleased(new InstantCommand(drive::lightOff, drive));
   }
 
+  private void generateTrajectories() {
+    slalomTrajectory = trajectoryForPath(
+      List.of(new Pose2d(0, 0, new Rotation2d()),
+        new Pose2d(2.25*dxy, -1.5*dxy, new Rotation2d(-Math.PI / 6)),
+        new Pose2d(4*dxy, -2*dxy, new Rotation2d()),
+        new Pose2d(6.25*dxy, -2*dxy, new Rotation2d()),
+        new Pose2d(8*dxy, 0, new Rotation2d(Math.PI / 6)),
+        new Pose2d(10*dxy, -0.5*dxy, new Rotation2d(-Math.PI / 2)),
+        new Pose2d(8.5*dxy, -1.8*dxy, new Rotation2d(-Math.PI)),
+        new Pose2d(7.5*dxy, -dxy, new Rotation2d((-4*Math.PI) / 3)),
+        new Pose2d(5*dxy, 0, new Rotation2d(Math.PI)),
+        new Pose2d(2.75*dxy, 0, new Rotation2d(Math.PI)),
+        new Pose2d(1.5*dxy, -1.5*dxy, new Rotation2d((5*Math.PI) / 4)),
+        new Pose2d(-dxy, -2.25*dxy, new Rotation2d(Math.PI))
+      ), 
+      false);
+    
+    bounceTrajectory1 = trajectoryForPath(
+      List.of(new Pose2d(0, 0, new Rotation2d()),
+        new Pose2d(1.25*dxy, -2*dxy, new Rotation2d(-Math.PI / 2))
+      ), 
+      false);
+    
+    bounceTrajectory2 = trajectoryForPath(
+      List.of(
+        new Pose2d(0, 0, new Rotation2d(Math.PI)),
+        new Pose2d(1.75*dxy, -0.5*dxy, new Rotation2d(5*Math.PI / 6)),
+        new Pose2d(3.8*dxy, -1.75*dxy, new Rotation2d(Math.PI / 2)),
+        new Pose2d(0, -3*dxy, new Rotation2d())
+      ), 
+      true);
+
+    bounceTrajectory3 = trajectoryForPath(
+      List.of(
+        new Pose2d(0, 0, new Rotation2d()),
+        new Pose2d(2.5*dxy, 0, new Rotation2d()),
+        new Pose2d(3.5*dxy, -dxy, new Rotation2d(-Math.PI / 2)),
+        new Pose2d(3*dxy, -2.75*dxy, new Rotation2d(Math.PI)),
+        new Pose2d(0, -2.75*dxy, new Rotation2d(Math.PI))
+      ), 
+      false);
+
+    bounceTrajectory4 = trajectoryForPath(
+      List.of(
+        new Pose2d(0, 0, new Rotation2d(Math.PI)),
+        new Pose2d(1.25*dxy, -2*dxy, new Rotation2d(Math.PI / 2))
+      ), 
+      true);
+
+    barrelTrajectory = trajectoryForPath(
+      List.of(
+        new Pose2d(0, 0, new Rotation2d()),
+        new Pose2d(3*dxy, 0, new Rotation2d()),
+        new Pose2d(4.25*dxy, dxy, new Rotation2d(Math.PI / 2)),
+        new Pose2d(3.25*dxy, 1.5*dxy, new Rotation2d(Math.PI)),
+        new Pose2d(2.75*dxy, dxy, new Rotation2d((3*Math.PI) / 2)),
+        new Pose2d(6.5*dxy, -0.25*dxy, new Rotation2d(-Math.PI / 6)),
+        new Pose2d(7*dxy, -dxy, new Rotation2d(-Math.PI / 2)),
+        new Pose2d(6.5*dxy, -1.75*dxy, new Rotation2d(Math.PI)),
+        new Pose2d(5.5*dxy, -dxy, new Rotation2d((-7*Math.PI) / 4)),
+        new Pose2d(9*dxy, dxy, new Rotation2d(-Math.PI / 6)),
+        new Pose2d(9.4*dxy, 0, new Rotation2d(Math.PI)),
+        new Pose2d(-dxy, -0.5*dxy, new Rotation2d(Math.PI))
+      ), 
+      true);
+
+    redGalacticTrajectoryA = trajectoryForPath(
+      List.of(
+        new Pose2d(0, 0, new Rotation2d(Math.PI)),
+        new Pose2d(3*dxy, 0, new Rotation2d(7*Math.PI / 6)),
+        new Pose2d(5*dxy, 0.5*dxy, new Rotation2d((-5*Math.PI) / 4)),
+        new Pose2d(6*dxy, -2*dxy, new Rotation2d(Math.PI)),
+        new Pose2d(11*dxy, 0, new Rotation2d(Math.PI))
+      ), 
+      true);
+
+    redGalacticTrajectoryB = trajectoryForPath(
+      List.of(
+        new Pose2d(0, 0, new Rotation2d(Math.PI)),
+        new Pose2d(3*dxy, -0.75*dxy, new Rotation2d((7*Math.PI) / 6)),
+        new Pose2d(5*dxy, 0.5*dxy, new Rotation2d((-7*Math.PI) / 6)),
+        new Pose2d(7*dxy, -dxy, new Rotation2d((7*Math.PI) / 6)),
+        new Pose2d(11*dxy, 0, new Rotation2d(Math.PI))
+      ), 
+      true);
+
+    blueGalacticTrajectoryA = trajectoryForPath(
+      List.of(
+        new Pose2d(0, 0, new Rotation2d(Math.PI)),
+        new Pose2d(3*dxy, 0, new Rotation2d(Math.PI)),
+        new Pose2d(6*dxy, 1.5*dxy, new Rotation2d((-7*Math.PI) / 6)),
+        new Pose2d(7*dxy, -dxy, new Rotation2d((7*Math.PI) / 6)),
+        new Pose2d(9*dxy, -0.5*dxy, new Rotation2d(Math.PI)),
+        new Pose2d(11*dxy, -0.5*dxy, new Rotation2d(Math.PI))
+      ), 
+      true);
+
+    blueGalacticTrajectoryB = trajectoryForPath(
+      List.of(
+        new Pose2d(0, 0, new Rotation2d(Math.PI)),
+        new Pose2d(3*dxy, 0, new Rotation2d(Math.PI)),
+        new Pose2d(6*dxy, 0.5*dxy, new Rotation2d((-7*Math.PI) / 6)),
+        new Pose2d(8*dxy, -dxy, new Rotation2d((7*Math.PI) / 6)),
+        new Pose2d(10*dxy, dxy, new Rotation2d(Math.PI)),
+        new Pose2d(11*dxy, dxy, new Rotation2d(Math.PI))
+      ), 
+      true);
+  }
+
   public void updateDashboard() {
     drive.updateDashboard();
     //colorSensor.updateDashboard();
     indexer.updateDashboard();
     shooter.updateDashboard();
+    chameleonVision.updateDashboard();
   }
 
-  /**
-   * Generate a trajectory following Ramsete command
-   * 
-   * This is very similar to the WPILib RamseteCommand example. It uses
-   * constants defined in the Constants.java file. These constants were 
-   * found empirically by using the frc-characterization tool.
-   * 
-   * @return A SequentialCommand that sets up and executes a trajectory following Ramsete command
-   */
-  private Command generateRamseteCommand() {
-    var autoVoltageConstraint =
-        new DifferentialDriveVoltageConstraint(
-            new SimpleMotorFeedforward(Constants.ksVolts, 
-                                       Constants.kvVoltSecondsPerMeter, 
-                                       Constants.kaVoltSecondsSquaredPerMeter),
-            Constants.kDriveKinematics,
-            10);
-
+  private Trajectory trajectoryForPath(List<Pose2d> path, boolean reversed) {
     TrajectoryConfig config =
         new TrajectoryConfig(Constants.kMaxSpeedMetersPerSecond, 
                              Constants.kMaxAccelerationMetersPerSecondSquared)
-            .setKinematics(Constants.kDriveKinematics)
-            .addConstraint(autoVoltageConstraint);
+            .setKinematics(drive.getKinematics())
+            .setReversed(reversed);
 
-    // This trajectory can be modified to suit your purposes
-    // Note that all coordinates are in meters, and follow NWU conventions.
-    // If you would like to specify coordinates in inches (which might be easier
-    // to deal with for the Romi), you can use the Units.inchesToMeters() method
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        /*new Pose2d(0, 0, new Rotation2d(0)),
-        List.of(
-          new Translation2d(0.5, 0.5),
-          new Translation2d(1.0, 0.5),
-          new Translation2d(1.5, 0),
-          new Translation2d(1.0, -0.5),
-          new Translation2d(0.5, -0.5)
-        ),
-        new Pose2d(0, 0, new Rotation2d(Math.PI)),*/
-        /*List.of(
-          new Pose2d(0, 0, new Rotation2d(0)),
-          new Pose2d(0.75, 0, new Rotation2d(Math.PI / 2))
-          ),*/
-          new Pose2d(0, 0, new Rotation2d(0)),
-          List.of(
-            new Translation2d(0.25, 0.25)
-          ),
-          new Pose2d(0, 0, new Rotation2d(0)),
-        config);
-      /*String trajectoryJSON = "paths/small.wpilib.json";
-      Trajectory tempTrajectory = new Trajectory();
-      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-      try {
-        tempTrajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-      } catch (IOException ex) {
-        DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
-      }
-      Transform2d transform = m_drivetrain.getPose().minus(tempTrajectory.getInitialPose());
-      Trajectory exampleTrajectory = tempTrajectory.transformBy(transform);*/
+    Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+      path,
+      config);
 
+      return trajectory;
+  }
+
+  public Command generateRamseteCommand(Trajectory trajectory) {
+    drive.plotTrajectory(trajectory);
+    
     RamseteCommand ramseteCommand = new RamseteCommand(
-        exampleTrajectory,
-        drive::getPose,
-        new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
-        new SimpleMotorFeedforward(Constants.ksVolts, Constants.kvVoltSecondsPerMeter, Constants.kaVoltSecondsSquaredPerMeter),
-        Constants.kDriveKinematics,
-        drive::getWheelSpeeds,
-        new PIDController(Constants.kPDriveVel, 0, 0),
-        new PIDController(Constants.kPDriveVel, 0, 0),
-        drive::tankDriveVolts,
-        drive);
+      trajectory, 
+      drive::getPose, 
+      new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta), 
+      drive.getFeedforward(), 
+      drive.getKinematics(),
+      drive::getWheelSpeeds, 
+      drive.getLeftRamsetePIDController(), 
+      drive.getRightRamsetePIDController(), 
+      drive::tankDriveVolts, 
+      drive
+      );
 
-    drive.resetOdometry(exampleTrajectory.getInitialPose());
-
-    // Set up a sequence of commands
-    // First, we want to reset the drivetrain odometry
-    return new InstantCommand(() -> drive.resetOdometry(exampleTrajectory.getInitialPose()), drive)
-        // next, we run the actual ramsete command
-        .andThen(ramseteCommand)
-
-        // Finally, we make sure that the robot stops
-        .andThen(new InstantCommand(() -> drive.tankDriveVolts(0, 0), drive));
-  } 
+  drive.resetOdometry(trajectory.getInitialPose());
+  return ramseteCommand.andThen(() -> drive.setOutput(0, 0));
+}
 
   public XboxController getDriveStick() {
     return driver;
@@ -315,6 +419,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     //return chooseAutoCommand.getSelected();
-    return generateRamseteCommand();
+    return chooseAutoCommand.getSelected().get();
   }
 }

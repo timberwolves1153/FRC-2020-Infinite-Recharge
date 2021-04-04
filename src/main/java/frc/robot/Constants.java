@@ -7,7 +7,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.util.Units;
 
 /**
  * Add your docs here.
@@ -48,9 +48,8 @@ public class Constants {
 
     public static final double kPDriveVel = 0.05;
 
-    public static final double kTrackwidthMeters = 1.330086493020229;
-    public static final DifferentialDriveKinematics kDriveKinematics =
-        new DifferentialDriveKinematics(kTrackwidthMeters);
+    //public static final double kTrackwidthMeters = 1.330086493020229;
+    public static final double kTrackwidthMeters = Units.inchesToMeters(22.0);
 
     public static final double kMaxSpeedMetersPerSecond = 0.4;
     public static final double kMaxAccelerationMetersPerSecondSquared = 0.2;
