@@ -27,7 +27,7 @@ public class Climber extends SubsystemBase {
   public Climber() {
     winchA = new VictorSPX(RobotMap.WINCH_A);
     winchB = new VictorSPX(RobotMap.WINCH_B);
-    armDown();
+    //armDown();
     configureMaster();
   }
 

@@ -128,6 +128,9 @@ public class Drive extends SubsystemBase {
     leftFollowerA.follow(leftMaster);
     rightFollowerA.follow(rightMaster);
 
+    leftMaster.setInverted(false);
+    rightMaster.setInverted(false);
+
     //Sets default brake mode
     leftMaster.setIdleMode(IdleMode.kBrake);
     rightMaster.setIdleMode(IdleMode.kBrake);
@@ -157,11 +160,11 @@ public class Drive extends SubsystemBase {
     setupPIDConstants(leftPID, p, i, d, f);
     setupPIDConstants(rightPID, p, i, d, f);
 
-    leftEncoder.setVelocityConversionFactor(0.0315561762079);
-    rightEncoder.setVelocityConversionFactor(0.0315561762079);
+    /*leftEncoder.setVelocityConversionFactor(0.0315561762079);
+    rightEncoder.setVelocityConversionFactor(0.0315561762079);*/
 
-    leftEncoder.setPositionConversionFactor(encoderPositionMetersConversionFactor);
-    rightEncoder.setPositionConversionFactor(encoderPositionMetersConversionFactor);
+    /*leftEncoder.setPositionConversionFactor(encoderPositionMetersConversionFactor);
+    rightEncoder.setPositionConversionFactor(encoderPositionMetersConversionFactor);*/
 
     // Trapezoidal Motion Profiling Parameters
     maxVelocity = 24;

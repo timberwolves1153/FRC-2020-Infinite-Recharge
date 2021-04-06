@@ -309,15 +309,15 @@ public class RobotContainer {
         new Pose2d(4.25*dxy, dxy, new Rotation2d(Math.PI / 2)),
         new Pose2d(3.25*dxy, 1.5*dxy, new Rotation2d(Math.PI)),
         new Pose2d(2.75*dxy, dxy, new Rotation2d((3*Math.PI) / 2)),
-        new Pose2d(6.5*dxy, -0.25*dxy, new Rotation2d(-Math.PI / 6)),
+        new Pose2d(6.5*dxy, 0, new Rotation2d(-Math.PI / 6)),
         new Pose2d(7*dxy, -dxy, new Rotation2d(-Math.PI / 2)),
         new Pose2d(6.5*dxy, -1.75*dxy, new Rotation2d(Math.PI)),
-        new Pose2d(5.5*dxy, -dxy, new Rotation2d((-7*Math.PI) / 4)),
+        new Pose2d(5.75*dxy, -0.75*dxy, new Rotation2d((-5*Math.PI) / 3)),
         new Pose2d(9*dxy, dxy, new Rotation2d(-Math.PI / 6)),
-        new Pose2d(9.4*dxy, 0, new Rotation2d(Math.PI)),
-        new Pose2d(-dxy, -0.5*dxy, new Rotation2d(Math.PI))
+        new Pose2d(9*dxy, 0, new Rotation2d(Math.PI)),
+        new Pose2d(-0.5*dxy, -0.25*dxy, new Rotation2d(Math.PI))
       ), 
-      true);
+      false);
 
     redGalacticTrajectoryA = trajectoryForPath(
       List.of(
