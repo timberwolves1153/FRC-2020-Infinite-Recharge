@@ -272,16 +272,17 @@ public class RobotContainer {
     
     bounceTrajectory1 = trajectoryForPath(
       List.of(new Pose2d(0, 0, new Rotation2d()),
-        new Pose2d(1.25*dxy, -2*dxy, new Rotation2d(-Math.PI / 2))
+        new Pose2d(1.15*dxy, -1.6*dxy, new Rotation2d(-Math.PI / 2))
       ), 
       false);
     
     bounceTrajectory2 = trajectoryForPath(
       List.of(
         new Pose2d(0, 0, new Rotation2d(Math.PI)),
-        new Pose2d(1.75*dxy, -0.5*dxy, new Rotation2d(5*Math.PI / 6)),
-        new Pose2d(3.8*dxy, -1.75*dxy, new Rotation2d(Math.PI / 2)),
-        new Pose2d(0, -3*dxy, new Rotation2d())
+        new Pose2d(1.25*dxy, -0.5*dxy, new Rotation2d(5*Math.PI / 6)),
+        new Pose2d(3*dxy, -1.6*dxy, new Rotation2d(Math.PI / 2)),
+        new Pose2d(2*dxy, -2.75*dxy, new Rotation2d()),
+        new Pose2d(-0.15*dxy, -2.75*dxy, new Rotation2d())
       ), 
       true);
 
@@ -289,16 +290,16 @@ public class RobotContainer {
       List.of(
         new Pose2d(0, 0, new Rotation2d()),
         new Pose2d(2.5*dxy, 0, new Rotation2d()),
-        new Pose2d(3.5*dxy, -dxy, new Rotation2d(-Math.PI / 2)),
-        new Pose2d(3*dxy, -2.75*dxy, new Rotation2d(Math.PI)),
-        new Pose2d(0, -2.75*dxy, new Rotation2d(Math.PI))
+        new Pose2d(3*dxy, -1.5*dxy, new Rotation2d(-Math.PI / 2)),
+        new Pose2d(2*dxy, -2.75*dxy, new Rotation2d(Math.PI)),
+        new Pose2d(-0.15*dxy, -3*dxy, new Rotation2d((-5*Math.PI) / 6))
       ), 
       false);
 
     bounceTrajectory4 = trajectoryForPath(
       List.of(
         new Pose2d(0, 0, new Rotation2d(Math.PI)),
-        new Pose2d(1.25*dxy, -2*dxy, new Rotation2d(Math.PI / 2))
+        new Pose2d(0.75*dxy, -2*dxy, new Rotation2d(Math.PI / 2))
       ), 
       true);
 
