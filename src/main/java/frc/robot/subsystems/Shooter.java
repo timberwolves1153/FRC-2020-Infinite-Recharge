@@ -85,7 +85,7 @@ public class Shooter extends SubsystemBase {
 
   // Tuned shooter PID values for common shooting positions
   private static final double[] SHOOTER_P = {.0005, .0005, .0005};
-  private static final double[] SHOOTER_F = {(.67/3400), (.75/3900), (.82/4500)};
+  private static final double[] SHOOTER_F = {(.6/3400), (.75/3900), (.82/4500)};
   private static final double[] SHOOTER_SETPOINT = {3400, 3700, 4500};
   //Setpoint Values: 3400, 4100, 4500
 
@@ -194,7 +194,6 @@ public class Shooter extends SubsystemBase {
       pidEnabled = true;
       shooterPID.setIAccum(0);
     }
-    setFeederSpeed(-0.8);
   }
 
   /**
@@ -203,7 +202,6 @@ public class Shooter extends SubsystemBase {
   public void pidOff() {
     pidEnabled = false;
     motorA.set(0);
-    setFeederSpeed(0);
   }
 
   /**

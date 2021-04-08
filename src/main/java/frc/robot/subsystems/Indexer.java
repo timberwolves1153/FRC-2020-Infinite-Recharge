@@ -9,6 +9,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,8 +18,8 @@ import frc.robot.RobotMap;
 
 public class Indexer extends SubsystemBase {
 
-  private VictorSPX insideCollectRoller;
-  private VictorSPX outsideCollectRoller;
+  //private VictorSPX insideCollectRoller;
+  private CANSparkMax outsideCollectRoller;
 
   private VictorSPX vIndexA;
   private VictorSPX vIndexB;
@@ -29,14 +31,25 @@ public class Indexer extends SubsystemBase {
    * Creates a new Indexer.
    */
   public Indexer() {
-    insideCollectRoller = new VictorSPX(RobotMap.INSIDE_COLLECT_ROLLER_MOTOR);
-    outsideCollectRoller = new VictorSPX(RobotMap.OUTSIDE_COLLECT_ROLLER_MOTOR);
+    //insideCollectRoller = new VictorSPX(RobotMap.INSIDE_COLLECT_ROLLER_MOTOR);
+    outsideCollectRoller = new CANSparkMax(RobotMap.OUTSIDE_COLLECT_ROLLER_MOTOR, CANSparkMax.MotorType.kBrushless);
     vIndexA = new VictorSPX(RobotMap.V_INDEX_MOTOR_A);
     vIndexB = new VictorSPX(RobotMap.V_INDEX_MOTOR_B);
 
     configMaster();
+    configSparkParams();
 
     SmartDashboard.putNumber("V Indexer Speed", vIndexSpeed);
+  }
+
+  private void configSparkParams() {
+    outsideCollectRoller.restoreFactoryDefaults();
+
+    outsideCollectRoller.setInverted(true);
+    
+    outsideCollectRoller.setIdleMode(IdleMode.kCoast);
+
+    outsideCollectRoller.burnFlash();
   }
 
   public void updateDashboard() {
@@ -65,21 +78,21 @@ public class Indexer extends SubsystemBase {
   }
 
   public void collect() {
-    insideCollectRoller.set(ControlMode.PercentOutput, -0.8);
-    outsideCollectRoller.set(ControlMode.PercentOutput, 0.8);
+    //insideCollectRoller.set(ControlMode.PercentOutput, -0.8);
+    outsideCollectRoller.set(0.6);
   }
 
   public void dispense() {
-    insideCollectRoller.set(ControlMode.PercentOutput, 1);
-    outsideCollectRoller.set(ControlMode.PercentOutput, -1);
+    //insideCollectRoller.set(ControlMode.PercentOutput, 1);
+    outsideCollectRoller.set(-1);
   }
 
   public void kick() {
-    insideCollectRoller.set(ControlMode.PercentOutput, -.8);
+    //insideCollectRoller.set(ControlMode.PercentOutput, -.8);
   }
 
   public void stop() {
-    insideCollectRoller.set(ControlMode.PercentOutput, 0);
-    outsideCollectRoller.set(ControlMode.PercentOutput, 0);
+    //insideCollectRoller.set(ControlMode.PercentOutput, 0);
+    outsideCollectRoller.set(0);
   }
 }
