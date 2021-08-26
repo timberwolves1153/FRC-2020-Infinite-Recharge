@@ -42,17 +42,24 @@ public class Constants {
     //public static final double kEncoderToDistanceMetersConversionFactor = 
 
     //Ramsete Command Constants
+    /*
     public static final double ksVolts = 0.159;
     public static final double kvVoltSecondsPerMeter = 3.87;
     public static final double kaVoltSecondsSquaredPerMeter = 0.503;
+    */
+
+    //Ramsete Command Constants
+    public static final double ksVolts = 0.176;
+    public static final double kvVoltSecondsPerMeter = 3.87;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.574;
 
     public static final double kPDriveVel = 0.05;
 
     //public static final double kTrackwidthMeters = 1.330086493020229;
     public static final double kTrackwidthMeters = Units.inchesToMeters(22.0);
 
-    public static final double kMaxSpeedMetersPerSecond = 2; //1.75
-    public static final double kMaxAccelerationMetersPerSecondSquared = 1.5; //1.5
+    public static final double kMaxSpeedMetersPerSecond = 1.5; //1.75
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1.0; //1.5
 
     public static final double kRamseteB = 2;
     public static final double kRamseteZeta = 0.7;

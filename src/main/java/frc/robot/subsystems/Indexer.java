@@ -45,7 +45,7 @@ public class Indexer extends SubsystemBase {
   private void configSparkParams() {
     outsideCollectRoller.restoreFactoryDefaults();
 
-    outsideCollectRoller.setInverted(true);
+    outsideCollectRoller.setInverted(false);
     
     outsideCollectRoller.setIdleMode(IdleMode.kCoast);
 
