@@ -58,8 +58,8 @@ public class Constants {
     //public static final double kTrackwidthMeters = 1.330086493020229;
     public static final double kTrackwidthMeters = Units.inchesToMeters(22.0);
 
-    public static final double kMaxSpeedMetersPerSecond = 1.5; //1.75
-    public static final double kMaxAccelerationMetersPerSecondSquared = 1.0; //1.5
+    public static final double kMaxSpeedMetersPerSecond = 1.0; //1.75
+    public static final double kMaxAccelerationMetersPerSecondSquared = 0.75; //1.5
 
     public static final double kRamseteB = 2;
     public static final double kRamseteZeta = 0.7;

@@ -8,6 +8,7 @@
 package frc.robot.commandGroups;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.commands.DriveForEncoder;
 import frc.robot.commands.DriveForEncoderWithCollector;
@@ -37,6 +38,6 @@ public class AutoCommandGroup extends SequentialCommandGroup {
     addCommands(new TurnWithLimelight(drive, vision));
     addCommands(new Shoot(shooter, vision, ShooterPosition.CR_CLOSE, true));*/
     addCommands(new Shoot(shooter, indexer, vision, ShooterPosition.AUTO_LINE, true));
-    addCommands(new DriveForEncoder(drive, 0.6, 1, 25));
+    //addCommands(Robot.m_robotContainer.generateRamseteCommand(Robot.m_robotContainer.getAutoLineToControlTrajectory()));
   }
 }

@@ -104,6 +104,7 @@ public class RobotContainer {
     private Trajectory redGalacticTrajectoryB;
     private Trajectory blueGalacticTrajectoryA;
     private Trajectory blueGalacticTrajectoryB;
+    private Trajectory autoLineToControlPanel;
 
     private double dxy;
 
@@ -180,6 +181,7 @@ public class RobotContainer {
     trajectoryChooser.addOption("Red Galactic B", redGalacticTrajectoryB);
     trajectoryChooser.addOption("Blue Galactic A", blueGalacticTrajectoryA);
     trajectoryChooser.addOption("Blue Galactic B", blueGalacticTrajectoryB);
+    trajectoryChooser.addOption("Auto Line", autoLineToControlPanel);
 
     chooseAutoCommand.setDefaultOption("Auto Command Group", () -> autoCommandGroup);
     chooseAutoCommand.addOption("Drive off Auto Line", () -> new DriveForEncoder(drive, 0.6, 1, 25));
@@ -254,6 +256,12 @@ public class RobotContainer {
   }
 
   private void generateTrajectories() {
+    autoLineToControlPanel = trajectoryForPath(
+      List.of(new Pose2d(0, 0, new Rotation2d()),
+        new Pose2d(-Units.inchesToMeters(68), 0, new Rotation2d()),
+        new Pose2d(-Units.inchesToMeters(162), 0, new Rotation2d(Math.PI / 7))
+      ), 
+    true);
     slalomTrajectory = trajectoryForPath(
       List.of(new Pose2d(0, 0, new Rotation2d()),
         new Pose2d(2.25*dxy, -1.5*dxy, new Rotation2d(-Math.PI / 6)),
@@ -403,7 +411,11 @@ public class RobotContainer {
 
   drive.resetOdometry(trajectory.getInitialPose());
   return ramseteCommand.andThen(() -> drive.setOutput(0, 0));
-}
+  }
+
+  public Trajectory getAutoLineToControlTrajectory() {
+    return autoLineToControlPanel;
+  }
 
   public XboxController getDriveStick() {
     return driver;

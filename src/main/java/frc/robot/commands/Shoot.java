@@ -59,7 +59,7 @@ public class Shoot extends CommandBase {
       shooter.setGainPreset(shooterPosition);
       this.shooterPosition = shooterPosition;
     }*/
-    if(shooter.isAtSetpoint()) {
+    if(shooter.isAtSetpoint() && (System.currentTimeMillis() - startTime) >= 1000) {
       shooter.setFeederSpeed(-1);
       indexer.kick();
       indexer.startVIndexer();
@@ -85,7 +85,7 @@ public class Shoot extends CommandBase {
   @Override
   public boolean isFinished() {
     if(isAuto) {
-      return (System.currentTimeMillis() - startTime) > 5000;
+      return (System.currentTimeMillis() - startTime) > 6000;
     } else {
       return false;
     }
