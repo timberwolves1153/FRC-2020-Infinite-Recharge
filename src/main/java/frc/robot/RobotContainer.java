@@ -80,6 +80,7 @@ public class RobotContainer {
     private JoystickButton drX;
     private JoystickButton drBumpLeft;
     private JoystickButton drBumpRight;
+    private JoystickButton drA;
 
     private SendableChooser<Supplier<Command>> chooseAutoCommand = new SendableChooser<>();
     private SendableChooser<Trajectory> trajectoryChooser = new SendableChooser<>();
@@ -140,6 +141,7 @@ public class RobotContainer {
 
     drStart = new JoystickButton(driver, XboxController.Button.kStart.value);
     drX = new JoystickButton(driver, XboxController.Button.kX.value);
+    drA = new JoystickButton(driver, XboxController.Button.kA.value);
     drBumpLeft = new JoystickButton(driver, XboxController.Button.kBumperLeft.value);
     drBumpRight = new JoystickButton(driver, XboxController.Button.kBumperRight.value);
 
@@ -251,6 +253,8 @@ public class RobotContainer {
     drX.whenPressed(profileCommand);
     drX.whenReleased(() -> profileCommand.cancel());
 
+    drA.whenPressed(() -> drive.resetOdometry(new Pose2d(0, 0, new Rotation2d())));
+
     drBumpLeft.whenPressed(new InstantCommand(drive::lightOn, drive));
     drBumpLeft.whenReleased(new InstantCommand(drive::lightOff, drive));
   }
@@ -258,8 +262,8 @@ public class RobotContainer {
   private void generateTrajectories() {
     autoLineToControlPanel = trajectoryForPath(
       List.of(new Pose2d(0, 0, new Rotation2d()),
-        new Pose2d(-Units.inchesToMeters(68), 0, new Rotation2d()),
-        new Pose2d(-Units.inchesToMeters(162), 0, new Rotation2d(Math.PI / 7))
+        new Pose2d(-Units.inchesToMeters(80), 0, new Rotation2d()),
+        new Pose2d(-Units.inchesToMeters(162), -Units.inchesToMeters(12), new Rotation2d())
       ), 
     true);
     slalomTrajectory = trajectoryForPath(

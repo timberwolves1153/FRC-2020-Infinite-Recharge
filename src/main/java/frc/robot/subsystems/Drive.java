@@ -416,5 +416,6 @@ public class Drive extends SubsystemBase {
     m_field.setRobotPose(pose);
     SmartDashboard.putNumber("Odometry X", pose.getX());
     SmartDashboard.putNumber("Odometry Y", pose.getY());
+    SmartDashboard.putNumber("Odometry Rotation", pose.getRotation().getRadians());
   }
 }
