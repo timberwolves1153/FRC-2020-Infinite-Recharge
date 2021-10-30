@@ -38,6 +38,8 @@ public class AutoCommandGroup extends SequentialCommandGroup {
     addCommands(new TurnWithLimelight(drive, vision));
     addCommands(new Shoot(shooter, vision, ShooterPosition.CR_CLOSE, true));*/
     addCommands(new Shoot(shooter, indexer, vision, ShooterPosition.AUTO_LINE, true));
+    //addCommands(new TurnForAngleCommand(17, 0.5, drive));
+    addCommands(new DriveForEncoderWithCollector(66, 1, drive, indexer));
     //addCommands(Robot.m_robotContainer.generateRamseteCommand(Robot.m_robotContainer.getAutoLineToControlTrajectory()));
   }
 }
